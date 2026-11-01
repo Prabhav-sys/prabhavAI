@@ -1,0 +1,57 @@
+prabhavAI
+An AI-powered platform where users upload their resumes, generate personalized interview questions,
+practice interviews, receive feedback, and purchase credits to access premium features.
+
+
+What will our application do?
+Module	                Features
+Authentication	        Google login, protected routes, user sessions
+Resume Analyzer	        PDF upload, text extraction, resume analysis
+AI Question Generator	Generate personalized interview questions
+Mock Interview	        Technical and HR interview sessions
+AI Evaluation	        Evaluate answers and provide feedback
+User Dashboard	        Interview history, reports, analytics
+Credit System	        Credit-based feature access
+Payments	            Razorpay integration
+Admin Dashboard	        User, credit and transaction management
+Deployment	            Production deployment
+
+
+
+
+2. Technology stack
+We'll use the MERN ecosystem and some additional technologies.
+
+Frontend:
+
+React.js + Vite
+Component architecture, hooks, routing and state management
+Tailwind CSS
+Redux Toolkit
+Framer Motion
+
+
+
+Backend:
+
+Node.js
+Express.js
+MongoDB + Mongoose
+Firebase Authentication
+
+
+AI, Payments and Infrastructure
+- Gemini API / LLM provider
+- PDF parsing and document processing
+- Razorpay payment gateway
+- Cloudinary or object storage for files
+- Render / Vercel deployment
+- Git and GitHub
+
+
+We'll also use:
+- Zod for request validation.
+- JWT-based backend session authentication.
+- Rate limiting and security middleware.
+- Environment variables for secrets.
+- Razorpay webhooks for payment verification.

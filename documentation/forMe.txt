@@ -1,0 +1,92 @@
+This is for my workflow:
+
+day-1:
+1.Before creating the application, check your development environment.
+-node js, npm , git , code , python
+-mongoDB Atlas account
+
+#make two directory in root folder (server,client)
+-in client create vite project
+
+and than :
+Technology	 Responsibility
+React	    -Building UI components
+Vite	    -Development server and build tool
+npm	        -Dependency management
+JSX	        -Writing UI using JavaScript syntax
+
+
+-in server do npm init install dependencies:express mongoose dotenv cors
+
+These are our initial dependencies.
+Package	Why do we need it?
+express	    Create backend server and REST APIs
+mongoose	Connect and interact with MongoDB
+dotenv	    Load environment variables
+cors	    Allow frontend-backend communication
+
+-Install Nodemon as a development dependency:
+
+
+
+
+#Configure package.json
+We need ES Modules so that we can use import and export throughout our backend.
+Run:
+npm pkg set type="module"
+npm pkg set scripts.dev="nodemon server.js"
+npm pkg set scripts.start="node server.js"
+
+Now your backend supports:
+import express from "express";
+Instead of the older:
+const express = require("express");
+
+
+
+#create initial folder structure for server :
+server/
+│
+├── config/
+│
+├── models/
+│
+├── routes/
+│
+├── controllers/
+│
+├── middleware/
+│
+├── services/
+│
+├── utils/
+│
+├── app.js
+├── server.js
+├── .env
+├── .env.example
+└── package.json
+
+
+
+Understand the architecture:
+We'll use a modular architecture.
+Directory	    Responsibility
+config	        Database and external service configurations
+models	        MongoDB schemas
+routes	        API endpoints
+controllers	    Handle incoming requests
+middleware	    Authentication, validation, error handling
+services	    Business logic and external integrations
+utils	        Reusable helper functions
+
+
+
+app.js -  configures the Express application.
+server.js - starts the HTTP server.
+-setup .env,.env.example, add monogdb connection string
+-setup all these and run backend 
+
+
+— Configure Git and .gitignore
+

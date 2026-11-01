@@ -1,0 +1,136 @@
+Phase 1 — Foundation and Project Setup
+
+Implementation
+1. Install and configure Node.js.
+2. Create the project repository.
+3. Initialize React using Vite.
+4. Initialize Express backend.
+5. Configure MongoDB.
+6. Connect frontend and backend.
+7. Create the first API endpoint.
+Deliverable: A working React application communicating with an Express server connected to MongoDB
+
+
+
+
+Phase 2 — Backend Architecture
+- MVC architecture.
+- Routes, controllers and services.
+- Mongoose schemas and relationships.
+- Centralized error handling.
+- Middleware.
+- API response structure.
+Deliverable: A properly structured backend, not a single massive app.js file.
+
+
+Phase 3 — Authentication and Authorization
+- Firebase Google Authentication.
+- User model.
+- Token verification.
+- Login and logout.
+- Protected routes.
+- Authentication middleware.
+- Role-based access control.
+Deliverable: Secure authentication and separate user/admin access.
+
+
+
+Phase 4 — Frontend Architecture and UI
+- React component architecture.
+- React Router.
+- Context and Redux Toolkit.
+- Reusable components.
+- Dashboard and navbar.
+- Tailwind CSS.
+- Framer Motion.
+Deliverable: Complete responsive frontend.
+
+
+
+Phase 5 — Resume Upload and Processing
+- File upload using Multer.
+- PDF validation.
+- PDF text extraction.
+- Resume data extraction.
+- Resume storage.
+- Resume analysis API.
+Deliverable: Users can upload a resume and receive structured analysis.
+
+
+
+Phase 6 — AI Integration
+- LLM API integration.
+- Prompt engineering.
+- Structured JSON outputs.
+- Interview question generation.
+- HR and technical question categories.
+- AI evaluation engine.
+- Feedback generation.
+Deliverable: Actual AI-powered interview preparation.
+
+
+
+Phase 7 — Mock Interview Engine
+- Interview session creation.
+- Question sequencing.
+- Answer submission.
+- Interview state management.
+- Evaluation.
+- Interview reports.
+Deliverable: Complete interview workflow.
+
+
+
+Phase 8 — Credit-Based System
+- Credit balance.
+- Credit deduction.
+- Credit transaction history.
+- Usage tracking.
+- Atomic database operations.
+- Preventing duplicate deductions.
+Deliverable: Working credit-based monetization system.
+
+
+
+Phase 9 — Razorpay Integration
+- Payment order creation.
+- Checkout integration.
+- Payment signature verification.
+- Webhooks.
+- Transaction records.
+- Credit addition after verified payment.
+Deliverable: Actual payment-to-credit workflow using Razorpay test mode.
+
+
+
+Phase 10 — Dashboard and Analytics
+- Interview history.
+- Resume analysis history.
+- Performance tracking.
+- Charts and statistics.
+- Admin dashboard.
+- User management.
+Deliverable: Complete user and admin dashboards.
+
+
+Phase 11 — Advanced Engineering
+- API rate limiting.
+- Input validation.
+- Secure file handling.
+- Logging.
+- API testing using Postman.
+- Database indexing.
+- Error handling.
+- Security testing.
+Deliverable: A more robust, production-oriented application.
+
+
+Phase 12 — Deployment and Production
+- GitHub repository.
+- Environment configuration.
+- MongoDB Atlas.
+- Frontend deployment.
+- Backend deployment.
+- Production testing.
+- Domain and deployment troubleshooting.
+Deliverable: A publicly accessible, deployed SaaS application.
