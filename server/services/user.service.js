@@ -1,4 +1,12 @@
+
 import User from "../models/User.js";
+import { NotFoundError } from "../utils/errors.js";
+
+import {
+    buildPagination,
+    buildSort,
+    escapeRegex
+} from "../utils/queryBuilder.js";
 
 // CREATE USER
 export const createUser = async (userData) => {
@@ -6,43 +14,95 @@ export const createUser = async (userData) => {
 };
 
 // GET ALL USERS
-export const getAllUsers = async (page = 1, limit = 10) => {
-    const skip = (page - 1) * limit;
+export const getAllUsers = async ({
+    page = 1,
+    limit = 10,
+    role,
+    sortBy = "createdAt",
+    order = "desc",
+    search
+}) => {
+    const { skip } = buildPagination(page, limit);
 
-    const users = await User.find()
-        .select("-__v")
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
+    const sort = buildSort(sortBy, order);
 
-    const totalUsers = await User.countDocuments();
+    const filter = {};
+
+    // Filtering
+    if (role) {
+        filter.role = role;
+    }
+
+    // Searching
+    if (search) {
+        const searchRegex = new RegExp(
+            escapeRegex(search),
+            "i"
+        );
+
+        filter.$or = [
+            { name: searchRegex },
+            { email: searchRegex }
+        ];
+    }
+
+    // Fetch records and count in parallel
+    const [users, total] = await Promise.all([
+        User.find(filter)
+            .select("name email avatarUrl createdAt")
+            .sort(sort)
+            .skip(skip)
+            .limit(limit)
+            .lean(),
+
+        User.countDocuments(filter)
+    ]);
 
     return {
         users,
-        totalUsers,
-        currentPage: page,
-        totalPages: Math.ceil(totalUsers / limit)
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit)
     };
 };
 
 // GET USER BY ID
 export const getUserById = async (userId) => {
-    return await User.findById(userId).select("-__v");
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new NotFoundError("User not found");
+    }
+
+    return user;
 };
 
-// UPDATE USER PROFILE
+// UPDATE USER
 export const updateUser = async (userId, updateData) => {
-    return await User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         userId,
         updateData,
         {
             new: true,
             runValidators: true
         }
-    ).select("-__v");
+    );
+
+    if (!user) {
+        throw new NotFoundError("User not found");
+    }
+
+    return user;
 };
 
 // DELETE USER
 export const deleteUser = async (userId) => {
-    return await User.findByIdAndDelete(userId);
+    const user = await User.findByIdAndDelete(userId);
+
+    if (!user) {
+        throw new NotFoundError("User not found");
+    }
+
+    return user;
 };

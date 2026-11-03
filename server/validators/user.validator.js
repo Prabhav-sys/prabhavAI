@@ -1,50 +1,27 @@
+
 import { z } from "zod";
 
 // CREATE USER
 export const createUserSchema = z.object({
-    firebaseUid: z.string().trim().min(1, "Firebase UID is required"),
-
-    name: z.string()
-        .trim()
-        .min(2, "Name must contain at least 2 characters")
-        .max(80, "Name cannot exceed 80 characters"),
-
-    email: z.string()
-        .trim()
-        .email("Invalid email address")
-        .toLowerCase()
+    firebaseUid: z.string().trim().min(1),
+    name: z.string().trim().min(1).max(100),
+    email: z.string().email().toLowerCase()
 }).strict();
-
 
 // UPDATE USER
 export const updateUserSchema = z.object({
-    name: z.string()
-        .trim()
-        .min(2)
-        .max(80)
-        .optional(),
-
-    email: z.string()
-        .trim()
-        .email("Invalid email address")
-        .toLowerCase()
-        .optional(),
-
-    avatarUrl: z.string()
-        .trim()
-        .url("Invalid avatar URL")
-        .or(z.literal(""))
-        .optional()
+    name: z.string().trim().min(1).max(100).optional(),
+    email: z.string().email().toLowerCase().optional(),
+    avatarUrl: z.string().optional()
 })
 .strict()
 .refine(
     (data) => Object.keys(data).length > 0,
-    { message: "At least one field is required for update" }
+    { message: "At least one field is required" }
 );
 
-
-// PAGINATION QUERY
-export const paginationSchema = z.object({
+// GET ALL USERS
+export const userQuerySchema = z.object({
     page: z.coerce.number()
         .int()
         .min(1)
@@ -54,5 +31,20 @@ export const paginationSchema = z.object({
         .int()
         .min(1)
         .max(100)
-        .default(10)
+        .default(10),
+
+    role: z.enum(["USER", "ADMIN"]).optional(),
+
+    sortBy: z.enum([
+        "createdAt",
+        "name",
+        "email"
+    ]).default("createdAt"),
+
+    order: z.enum(["asc", "desc"]).default("desc"),
+
+    search: z.string()
+        .trim()
+        .max(100)
+        .optional()
 }).strict();

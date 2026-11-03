@@ -21,19 +21,18 @@ export const createUserController = async (req, res) => {
 
 // GET ALL USERS
 export const getAllUsersController = async (req, res) => {
-    const { page, limit } = res.locals.validated.query;
+    const query = res.locals.validated.query;
 
-    const result = await userService.getAllUsers(page, limit);
+    const result = await userService.getAllUsers(query);
 
     return sendSuccess(res, {
-        statusCode: 200,
         message: "Users fetched successfully",
         data: result.users,
         meta: {
-            page,
-            limit,
-            totalUsers: result.totalUsers,
-            totalPages: Math.ceil(result.totalUsers / limit)
+            page: result.page,
+            limit: result.limit,
+            totalUsers: result.total,
+            totalPages: result.totalPages
         }
     });
 };

@@ -6,9 +6,8 @@ import asyncHandler from "../utils/asyncHandler.js";
 import {
     createUserSchema,
     updateUserSchema,
-    paginationSchema
+    userQuerySchema
 } from "../validators/user.validator.js";
-
 import {
     createUserController,
     getAllUsersController,
@@ -61,7 +60,7 @@ router.post(
 
 router.get(
     "/",
-    validate(paginationSchema, "query"),
+    validate(userQuerySchema, "query"),
     asyncHandler(getAllUsersController)
 );
 
