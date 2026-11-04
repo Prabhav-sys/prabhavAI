@@ -24,7 +24,13 @@ const corsOptions = {
 };
 
 // 1. Security headers
-app.use(helmet());
+app.use(
+    helmet({
+        crossOriginOpenerPolicy: {
+            policy: "same-origin-allow-popups"
+        }
+    })
+);
 
 // 2. CORS
 app.use(cors(corsOptions));

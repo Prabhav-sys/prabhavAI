@@ -17,3 +17,14 @@ build/
 
 # System files
 .DS_Store
+
+
+# Firebase credentials
+*service-account*.json
+*serviceAccount*.json
+*-firebase-adminsdk-*.json
+
+# Frontend environment files
+.env.local
+.env.*.local
+

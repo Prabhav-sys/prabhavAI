@@ -16,7 +16,14 @@ const envSchema = z.object({
 
     CLIENT_URL: z.string()
         .url("CLIENT_URL must be a valid URL")
-        .default("http://localhost:5173")
+        .default("http://localhost:5173"),
+
+    // Firebase configuration
+    FIREBASE_PROJECT_ID: z.string()
+        .min(1, "FIREBASE_PROJECT_ID is required"),
+
+    GOOGLE_APPLICATION_CREDENTIALS: z.string()
+        .min(1, "GOOGLE_APPLICATION_CREDENTIALS is required")
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
@@ -40,5 +47,9 @@ export default {
     nodeEnv: env.NODE_ENV,
     port: env.PORT,
     mongodbUri: env.MONGODB_URI,
-    clientUrl: env.CLIENT_URL
+    clientUrl: env.CLIENT_URL,
+
+    // Firebase configuration
+    firebaseProjectId: env.FIREBASE_PROJECT_ID,
+    googleApplicationCredentials: env.GOOGLE_APPLICATION_CREDENTIALS
 };
