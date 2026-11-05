@@ -12,6 +12,10 @@ const navigation = [
         path: "/resume-analysis"
     },
     {
+        label: "Job Matching",
+        path: "/job-matching"
+    },
+    {
         label: "Mock Interview",
         path: "/mock-interview"
     },

@@ -20,6 +20,7 @@ import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 
 import ResumeAnalysis from "./pages/ResumeAnalysis";
+import JobMatching from "./pages/JobMatching";
 import MockInterview from "./pages/MockInterview";
 import InterviewHistory from "./pages/InterviewHistory";
 import Profile from "./pages/Profile";
@@ -59,6 +60,11 @@ function App() {
                         <Route
                             path="/resume-analysis"
                             element={<ResumeAnalysis />}
+                        />
+
+                        <Route
+                            path="/job-matching"
+                            element={<JobMatching />}
                         />
 
                         <Route

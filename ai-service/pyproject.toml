@@ -1,0 +1,42 @@
+[project]
+name = "prabhavai-ai-service"
+version = "0.1.0"
+description = "AI and document intelligence microservice for prabhavAI"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+dependencies = [
+  "fastapi>=0.115,<1.0",
+  "uvicorn[standard]>=0.34,<1.0",
+  "pydantic>=2.10,<3.0",
+  "pydantic-settings>=2.7,<3.0",
+  "python-multipart>=0.0.20,<1.0",
+  "pymupdf>=1.25,<2.0",
+  "openai>=1.60,<3.0",
+  "qdrant-client>=1.13,<2.0",
+  "fastembed>=0.6,<1.0",
+  "tavily-python>=0.5,<1.0",
+  "pymongo>=4.10,<5.0",
+  "tenacity>=9.0,<10.0",
+  "structlog>=25.1,<26.0",
+  "orjson>=3.10,<4.0",
+]
+
+[project.optional-dependencies]
+weaviate = ["weaviate-client>=4.10,<5.0"]
+
+[dependency-groups]
+dev = ["pytest>=8.3,<9.0", "pytest-asyncio>=0.25,<2.0", "httpx>=0.28,<1.0", "ruff>=0.9,<1.0"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.format]
+quote-style = "double"

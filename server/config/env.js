@@ -1,3 +1,4 @@
+
 import "dotenv/config";
 import { z } from "zod";
 
@@ -23,7 +24,21 @@ const envSchema = z.object({
         .min(1, "FIREBASE_PROJECT_ID is required"),
 
     GOOGLE_APPLICATION_CREDENTIALS: z.string()
-        .min(1, "GOOGLE_APPLICATION_CREDENTIALS is required")
+        .min(1, "GOOGLE_APPLICATION_CREDENTIALS is required"),
+
+    // AI Service configuration
+    AI_SERVICE_URL: z.string()
+        .url()
+        .default("http://127.0.0.1:8001"),
+
+    AI_SERVICE_API_KEY: z.string()
+        .min(32, "AI_SERVICE_API_KEY must be at least 32 characters"),
+
+    MAX_RESUME_SIZE_MB: z.coerce.number()
+        .int()
+        .min(1)
+        .max(20)
+        .default(5)
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
@@ -51,5 +66,10 @@ export default {
 
     // Firebase configuration
     firebaseProjectId: env.FIREBASE_PROJECT_ID,
-    googleApplicationCredentials: env.GOOGLE_APPLICATION_CREDENTIALS
+    googleApplicationCredentials: env.GOOGLE_APPLICATION_CREDENTIALS,
+
+    // AI Service configuration
+    aiServiceUrl: env.AI_SERVICE_URL,
+    aiServiceApiKey: env.AI_SERVICE_API_KEY,
+    maxResumeSizeMb: env.MAX_RESUME_SIZE_MB
 };
