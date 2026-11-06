@@ -57,6 +57,7 @@ function MockInterview() {
     );
     const [questionIndex, setQuestionIndex] = useState(0);
     const [answers, setAnswers] = useState({});
+    const [codeLanguages, setCodeLanguages] = useState({});
     const [questions, setQuestions] = useState([]);
     const [evaluations, setEvaluations] = useState({});
     const [sessionId, setSessionId] = useState(null);
@@ -135,6 +136,7 @@ function MockInterview() {
             setQuestions([result.question]);
             setQuestionIndex(0);
             setAnswers({});
+            setCodeLanguages({});
             setEvaluations({});
             setReport(null);
             setStage("workspace");
@@ -158,11 +160,14 @@ function MockInterview() {
         }
     };
 
-    const submitAnswer = async () => {
+    const submitAnswer = async ({ answerMode, codeLanguage } = {}) => {
         if (!sessionId || !currentAnswer.trim()) return;
         setLoading(true);
         try {
-            const result = await submitInterviewAnswer(sessionId, currentAnswer);
+            const result = await submitInterviewAnswer(sessionId, currentAnswer, {
+                answerMode,
+                ...(codeLanguage ? { codeLanguage } : {})
+            });
             const nextAnswers = {
                 ...answers,
                 [questionIndex]: currentAnswer.trim()
@@ -172,6 +177,12 @@ function MockInterview() {
                 [questionIndex]: result.evaluation
             };
             setAnswers(nextAnswers);
+            if (codeLanguage) {
+                setCodeLanguages((previous) => ({
+                    ...previous,
+                    [questionIndex]: codeLanguage
+                }));
+            }
             setEvaluations(nextEvaluations);
 
             if (result.completed) {
@@ -229,6 +240,7 @@ function MockInterview() {
         setResumeName("");
         setQuestionIndex(0);
         setAnswers({});
+        setCodeLanguages({});
         setEvaluations({});
         setQuestions([]);
         setSessionId(null);
@@ -287,6 +299,7 @@ function MockInterview() {
                 <InterviewResults
                     config={config}
                     answers={answers}
+                    codeLanguages={codeLanguages}
                     questions={questions}
                     evaluations={evaluations}
                     report={report}

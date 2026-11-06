@@ -2,7 +2,15 @@
 import Card from "../../../components/ui/Card";
 import Button from "../../../components/ui/Button";
 
-function InterviewResults({ config, answers, questions, evaluations, report, onRestart }) {
+function InterviewResults({
+    config,
+    answers,
+    codeLanguages,
+    questions,
+    evaluations,
+    report,
+    onRestart
+}) {
     const answeredCount = Object.values(answers).filter(
         (answer) => answer.trim().length > 0
     ).length;
@@ -90,9 +98,18 @@ function InterviewResults({ config, answers, questions, evaluations, report, onR
                             )}
                         </div>
 
-                        <p>
-                            {answers[index]?.trim() || "No response provided."}
-                        </p>
+                        {question.responseMode === "code" ? (
+                            <pre className="code-answer-result">
+                                <code>
+                                    {answers[index]?.trim() || "No response provided."}
+                                </code>
+                                {codeLanguages?.[index] && (
+                                    <small>{codeLanguages[index]}</small>
+                                )}
+                            </pre>
+                        ) : (
+                            <p>{answers[index]?.trim() || "No response provided."}</p>
+                        )}
                         {evaluations[index] && (
                             <>
                                 <p className="response-feedback">

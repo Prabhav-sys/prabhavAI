@@ -6,6 +6,12 @@ const questionSchema = new mongoose.Schema(
         category: { type: String, required: true, maxlength: 80 },
         difficulty: { type: String, required: true },
         whatItAssesses: { type: String, default: "" },
+        responseMode: { type: String, enum: ["voice", "code"], default: "voice" },
+        codeLanguage: {
+            type: String,
+            enum: ["python", "javascript", "typescript", "java", "cpp", "go", "sql", null],
+            default: null
+        },
         evaluationCriteria: { type: [String], default: [] }
     },
     { _id: false }
@@ -25,6 +31,12 @@ const turnSchema = new mongoose.Schema(
     {
         question: { type: questionSchema, required: true },
         answer: { type: String, default: null, maxlength: 5000 },
+        answerMode: { type: String, enum: ["voice", "code"], default: "voice" },
+        codeLanguage: {
+            type: String,
+            enum: ["python", "javascript", "typescript", "java", "cpp", "go", "sql", null],
+            default: null
+        },
         evaluation: { type: evaluationSchema, default: null },
         answeredAt: { type: Date, default: null }
     },

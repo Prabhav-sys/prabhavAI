@@ -24,5 +24,9 @@ export const startInterviewSessionSchema = generateInterviewQuestionsSchema.exte
 });
 
 export const submitInterviewAnswerSchema = z.object({
-    answer: z.string().trim().min(1).max(5000)
+    answer: z.string().trim().min(1).max(5000),
+    answerMode: z.enum(["voice", "code"]).default("voice"),
+    codeLanguage: z.enum([
+        "python", "javascript", "typescript", "java", "cpp", "go", "sql"
+    ]).optional()
 }).strict();

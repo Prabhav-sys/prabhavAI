@@ -18,6 +18,10 @@ class InterviewQuestion(BaseModel):
     category: str
     difficulty: Literal["easy", "medium", "hard"]
     what_it_assesses: str
+    response_mode: Literal["voice", "code"] = "voice"
+    code_language: Literal[
+        "python", "javascript", "typescript", "java", "cpp", "go", "sql"
+    ] | None = None
     evaluation_criteria: list[str] = Field(default_factory=list, max_length=6)
     suggested_follow_up: str | None = None
 
@@ -40,7 +44,12 @@ class InterviewSessionStartRequest(BaseModel):
 class InterviewTurn(BaseModel):
     question: str = Field(min_length=1, max_length=2000)
     category: str = Field(min_length=1, max_length=80)
+    response_mode: Literal["voice", "code"] = "voice"
     answer: str = Field(min_length=1, max_length=5000)
+    answer_mode: Literal["voice", "code"] = "voice"
+    code_language: Literal[
+        "python", "javascript", "typescript", "java", "cpp", "go", "sql"
+    ] | None = None
     previous_score: int | None = Field(default=None, ge=1, le=5)
     previous_feedback: str | None = Field(default=None, max_length=300)
 
@@ -69,6 +78,10 @@ class InterviewTurnRequest(BaseModel):
     completed_turns: list[InterviewTurn] = Field(default_factory=list)
     current_question: InterviewQuestion
     answer: str = Field(min_length=1, max_length=5000)
+    answer_mode: Literal["voice", "code"] = "voice"
+    code_language: Literal[
+        "python", "javascript", "typescript", "java", "cpp", "go", "sql"
+    ] | None = None
     completed_count: int = Field(ge=1)
     full_interview: bool = False
     elapsed_minutes: float = Field(default=0, ge=0, le=40)

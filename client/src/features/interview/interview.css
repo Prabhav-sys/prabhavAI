@@ -833,8 +833,73 @@
     box-shadow: 0 0 0 3px rgba(83, 104, 232, 0.12);
 }
 
+.candidate-answer-card textarea[readonly] {
+    background: #f5f6fa;
+    cursor: not-allowed;
+}
+
+.candidate-answer-card textarea.code-editor {
+    min-height: 280px;
+    resize: vertical;
+    background: #151a25;
+    color: #e7ecf5;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 13px;
+    line-height: 1.65;
+    tab-size: 4;
+}
+
 .candidate-answer-card textarea::placeholder {
     color: #97a1b1;
+}
+
+.code-language-picker,
+.interviewer-voice-picker {
+    display: grid;
+    gap: 5px;
+    color: var(--room-muted);
+    font-size: 11px;
+}
+
+.code-language-picker select,
+.interviewer-voice-picker select {
+    min-height: 34px;
+    max-width: 250px;
+    padding: 6px 9px;
+    border: 1px solid var(--room-line);
+    border-radius: 8px;
+    background: white;
+    color: var(--room-ink);
+    font: inherit;
+}
+
+.interviewer-voice-picker {
+    margin-top: 12px;
+}
+
+.code-response-note {
+    margin: 9px 0 0;
+    color: var(--room-muted);
+    font-size: 11px;
+}
+
+.code-answer-result {
+    position: relative;
+    overflow: auto;
+    margin: 12px 0;
+    padding: 16px;
+    border-radius: 10px;
+    background: #151a25;
+    color: #e7ecf5;
+    font: 13px/1.6 Consolas, "Courier New", monospace;
+    white-space: pre-wrap;
+}
+
+.code-answer-result small {
+    display: block;
+    margin-top: 10px;
+    color: #aab4c5;
+    font-family: inherit;
 }
 
 .voice-privacy-note {

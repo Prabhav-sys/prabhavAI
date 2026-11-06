@@ -72,7 +72,9 @@ export const submitInterviewAnswerController = async (req, res, next) => {
         const result = await submitInterviewAnswer({
             firebaseUid: req.auth.uid,
             sessionId: req.params.sessionId,
-            answer: parsed.data.answer
+            answer: parsed.data.answer,
+            answerMode: parsed.data.answerMode,
+            codeLanguage: parsed.data.codeLanguage
         });
         return res.status(200).json({
             success: true,

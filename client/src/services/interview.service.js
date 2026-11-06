@@ -39,13 +39,13 @@ export const startInterviewSession = async (config) => {
     return response.data.data;
 };
 
-export const submitInterviewAnswer = async (sessionId, answer) => {
-    const response = await api.post(
+export const submitInterviewAnswer = async (sessionId, answer, response = {}) => {
+    const apiResponse = await api.post(
         `/interviews/sessions/${sessionId}/answer`,
-        { answer },
+        { answer, ...response },
         { timeout: 180000 }
     );
-    return response.data.data;
+    return apiResponse.data.data;
 };
 
 export const abandonInterviewSession = async (sessionId) => {

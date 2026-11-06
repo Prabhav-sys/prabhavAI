@@ -1,7 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { startInterviewSessionSchema } from "../validators/interview.validation.js";
+import {
+    startInterviewSessionSchema,
+    submitInterviewAnswerSchema
+} from "../validators/interview.validation.js";
 
 const validPayload = {
     role: "Software Engineer",
@@ -62,6 +65,25 @@ test("full interview requires the full-session sentinel and accepts the 100-cred
             ...validPayload,
             questionCount: 80,
             fullInterview: true
+        }).success,
+        false
+    );
+});
+
+test("interview answer accepts code responses with a supported language", () => {
+    assert.equal(
+        submitInterviewAnswerSchema.safeParse({
+            answer: "print('hello')",
+            answerMode: "code",
+            codeLanguage: "python"
+        }).success,
+        true
+    );
+    assert.equal(
+        submitInterviewAnswerSchema.safeParse({
+            answer: "print('hello')",
+            answerMode: "code",
+            codeLanguage: "invalid"
         }).success,
         false
     );

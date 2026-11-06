@@ -57,6 +57,7 @@ async def test_start_interview_generates_personalized_opening_question(monkeypat
         assert "resume evidence" in kwargs["user"].lower()
         assert "Cloud migration" in kwargs["user"]
         assert "no planned question count" in kwargs["user"]
+        assert "introduce themself" in kwargs["user"]
         return {
             "question": {
                 "question": "Tell me about the cloud migration you led.",
@@ -82,6 +83,33 @@ async def test_start_interview_generates_personalized_opening_question(monkeypat
 
     assert isinstance(result["question"], InterviewQuestion)
     assert result["question"].question.startswith("Tell me")
+    assert result["question"].response_mode == "voice"
+
+
+def test_code_interview_question_and_answer_fields():
+    question = InterviewQuestion(
+        question="Implement a function to merge sorted arrays.",
+        category="Coding",
+        difficulty="medium",
+        what_it_assesses="Algorithmic problem solving",
+        response_mode="code",
+        code_language="python",
+    )
+    request = InterviewTurnRequest(
+        role="Backend Engineer",
+        experience_level="mid",
+        interview_type="technical",
+        difficulty="medium",
+        question_count=5,
+        current_question=question,
+        answer="def merge(left, right):\n    return sorted(left + right)",
+        answer_mode="code",
+        code_language="python",
+        completed_count=1,
+    )
+    assert request.current_question.response_mode == "code"
+    assert request.answer_mode == "code"
+    assert request.code_language == "python"
 
 
 @pytest.mark.asyncio
@@ -89,6 +117,7 @@ async def test_interview_turn_adapts_and_scores_answer(monkeypatch):
     async def fake_complete_json(**kwargs):
         assert "Candidate responses completed including this answer: 2" in kwargs["user"]
         assert "What trade-off did you make?" in kwargs["user"]
+        assert "Include one practical, role-appropriate coding exercise" in kwargs["user"]
         return {
             "evaluation": {
                 "score": 4,
@@ -102,6 +131,8 @@ async def test_interview_turn_adapts_and_scores_answer(monkeypatch):
                 "category": "Impact",
                 "difficulty": "medium",
                 "what_it_assesses": "Outcome measurement",
+                "response_mode": "code",
+                "code_language": "python",
                 "evaluation_criteria": ["Uses measurable outcomes"],
             },
             "final_report": None,
@@ -135,6 +166,8 @@ async def test_interview_turn_adapts_and_scores_answer(monkeypatch):
 
     assert result.evaluation.score == 4
     assert result.next_question.question == "How did you measure the result?"
+    assert result.next_question.response_mode == "code"
+    assert result.next_question.code_language == "python"
     assert result.is_complete is False
 
 

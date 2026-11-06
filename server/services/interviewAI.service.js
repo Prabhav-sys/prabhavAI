@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "crypto";
 import mongoose from "mongoose";
 import AppError from "../utils/AppError.js";
-import { ConflictError, NotFoundError } from "../utils/errors.js";
+import { BadRequestError, ConflictError, NotFoundError } from "../utils/errors.js";
 import env from "../config/env.js";
 import Resume from "../models/Resume.js";
 import InterviewSession from "../models/InterviewSession.js";
@@ -41,6 +41,8 @@ const mapQuestion = (question) => ({
     category: question.category,
     difficulty: question.difficulty,
     whatItAssesses: question.what_it_assesses,
+    responseMode: question.response_mode || "voice",
+    codeLanguage: question.code_language || null,
     evaluationCriteria: question.evaluation_criteria
 });
 
@@ -259,7 +261,13 @@ export const startInterviewSession = async ({
     }
 };
 
-export const submitInterviewAnswer = async ({ firebaseUid, sessionId, answer }) => {
+export const submitInterviewAnswer = async ({
+    firebaseUid,
+    sessionId,
+    answer,
+    answerMode = "voice",
+    codeLanguage
+}) => {
     const session = await InterviewSession.findOne({ _id: sessionId, firebaseUid });
 
     if (!session) {
@@ -293,6 +301,12 @@ export const submitInterviewAnswer = async ({ firebaseUid, sessionId, answer }) 
     if (!currentTurn || currentTurn.answer) {
         throw new ConflictError("This interview turn has already been submitted.");
     }
+    if (answerMode !== (currentTurn.question.responseMode || "voice")) {
+        throw new BadRequestError("Answer using the response format requested for this question.");
+    }
+    if (answerMode === "code" && !codeLanguage) {
+        throw new BadRequestError("Select a programming language for your code response.");
+    }
 
     const { resumeContext } = session.resumeId || session.jobMatchId
         ? await getResumeContext({
@@ -311,9 +325,12 @@ export const submitInterviewAnswer = async ({ firebaseUid, sessionId, answer }) 
         .map((turn) => ({
             question: turn.question.question.slice(0, 600),
             category: turn.question.category,
+            response_mode: turn.question.responseMode || "voice",
             answer: turn.answer.slice(-1000),
             previous_score: turn.evaluation?.score ?? null,
-            previous_feedback: turn.evaluation?.feedback?.slice(0, 300) ?? null
+            previous_feedback: turn.evaluation?.feedback?.slice(0, 300) ?? null,
+            answer_mode: turn.answerMode || "voice",
+            code_language: turn.codeLanguage || null
         }));
     const completedCount = completedTurns.length + 1;
     const elapsedMs = Date.now() - session.createdAt.getTime();
@@ -329,6 +346,8 @@ export const submitInterviewAnswer = async ({ firebaseUid, sessionId, answer }) 
             suggested_follow_up: null
         },
         answer,
+        answer_mode: answerMode,
+        code_language: answerMode === "code" ? codeLanguage : null,
         completed_count: completedCount,
         full_interview: session.fullInterview,
         elapsed_minutes: Math.min(elapsedMs / 60000, 40),
@@ -372,6 +391,8 @@ export const submitInterviewAnswer = async ({ firebaseUid, sessionId, answer }) 
     }
 
     currentTurn.answer = answer;
+    currentTurn.answerMode = answerMode;
+    currentTurn.codeLanguage = answerMode === "code" ? codeLanguage || null : null;
     currentTurn.evaluation = {
         score: result.evaluation.score,
         feedback: result.evaluation.feedback,
@@ -432,6 +453,8 @@ export const submitInterviewAnswer = async ({ firebaseUid, sessionId, answer }) 
         turns: session.turns.map((turn) => ({
             question: turn.question,
             answer: turn.answer,
+            answerMode: turn.answerMode,
+            codeLanguage: turn.codeLanguage,
             evaluation: turn.evaluation
         }))
     };
