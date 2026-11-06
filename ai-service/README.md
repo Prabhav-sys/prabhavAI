@@ -63,6 +63,8 @@ All protected endpoints require `X-Internal-API-Key` and `X-User-ID`. The Node b
 
 The interview session endpoints are turn-based: the browser handles optional speech recognition and speech playback, while Node persists the session and forwards the transcript to this service for evaluation and the next adaptive question. Raw interview audio is not sent to this service.
 
+Full interview sessions use adaptive questions without a preset question count and are capped at 40 minutes by the Node backend. The AI service receives the elapsed time and must return the final evaluation when that limit is reached.
+
 ## Important integration contract
 
 `POST /resumes/analyze` returns structured analysis and a generated `resume_id` if one was not supplied. The Node backend should persist the resume metadata, status, analysis and ownership in MongoDB. This service indexes chunks in Qdrant using `user_id` and `resume_id` payload fields. Deletion must be coordinated by Node when a resume is deleted.

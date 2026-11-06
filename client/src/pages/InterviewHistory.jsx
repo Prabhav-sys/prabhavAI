@@ -69,7 +69,9 @@ function InterviewHistory() {
                         <div key={session.id}>
                             <strong>{session.role}</strong>
                             <p>{session.type} · {session.difficulty} ·{" "}
-                                {session.answeredCount} questions · Score {session.overallScore ?? "—"}/5
+                                {session.fullInterview
+                                    ? `Full interview · ${session.answeredCount} questions discussed`
+                                    : `${session.answeredCount} questions`} · Score {session.overallScore ?? "—"}/5
                             </p>
                             {session.summary && <p>{session.summary}</p>}
                             <small>

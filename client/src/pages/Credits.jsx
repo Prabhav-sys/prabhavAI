@@ -204,7 +204,8 @@ function Credits() {
                                 ["Job fit for one posting", pricing?.features?.jobMatch],
                                 ["5-question interview", pricing?.features?.interview?.[5]],
                                 ["10-question interview", pricing?.features?.interview?.[10]],
-                                ["20-question interview", pricing?.features?.interview?.[20]]
+                                ["20-question interview", pricing?.features?.interview?.[20]],
+                                ["Full interview (up to 40 minutes)", pricing?.features?.interview?.full]
                             ].map(([label, amount]) => (
                                 <div className="credits-cost-item" key={label}>
                                     <span>{label}</span>

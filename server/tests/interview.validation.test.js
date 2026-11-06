@@ -47,3 +47,22 @@ test("interview session requires resume context and rejects unknown properties",
         false
     );
 });
+
+test("full interview requires the full-session sentinel and accepts the 100-credit format", () => {
+    assert.equal(
+        startInterviewSessionSchema.safeParse({
+            ...validPayload,
+            questionCount: 5,
+            fullInterview: true
+        }).success,
+        true
+    );
+    assert.equal(
+        startInterviewSessionSchema.safeParse({
+            ...validPayload,
+            questionCount: 80,
+            fullInterview: true
+        }).success,
+        false
+    );
+});

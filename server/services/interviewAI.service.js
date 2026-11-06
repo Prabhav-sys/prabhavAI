@@ -8,6 +8,7 @@ import InterviewSession from "../models/InterviewSession.js";
 import JobMatch from "../models/JobMatch.js";
 import CreditReservation from "../models/CreditReservation.js";
 import {
+    calculateInterviewCharge,
     getFeatureCost,
     refundReservation,
     reserveCredits,
@@ -28,6 +29,7 @@ const interviewTypes = {
     HR: "behavioral",
     Mixed: "mixed"
 };
+const FULL_INTERVIEW_MAX_DURATION_MS = 40 * 60 * 1000;
 
 const walletIdempotencyKey = (firebaseUid, feature, requestKey) =>
     createHash("sha256")
@@ -152,6 +154,7 @@ const toAiConfig = (payload, resumeContext) => ({
     interview_type: interviewTypes[payload.type],
     difficulty: payload.difficulty.toLowerCase(),
     question_count: payload.questionCount,
+    ...(payload.fullInterview ? { full_interview: true } : {}),
     ...(resumeContext ? { resume_context: resumeContext } : {})
 });
 
@@ -187,13 +190,19 @@ export const startInterviewSession = async ({
             questionCount: existing.questionCount,
             questionIndex: existing.turns.length - 1,
             question: existing.turns.at(-1).question,
-            creditCost: existing.reservedCredits
+            creditCost: existing.reservedCredits,
+            startedAt: existing.createdAt,
+            fullInterview: existing.fullInterview
         };
     }
 
     const { resume, resumeContext } = await getResumeContext({ firebaseUid, payload });
     const sessionId = new mongoose.Types.ObjectId();
-    const reservedCredits = getFeatureCost("INTERVIEW", payload.questionCount);
+    const reservedCredits = getFeatureCost(
+        "INTERVIEW",
+        payload.questionCount,
+        payload.fullInterview
+    );
     const reservation = await reserveCredits({
         firebaseUid,
         amount: reservedCredits,
@@ -223,6 +232,7 @@ export const startInterviewSession = async ({
             type: payload.type,
             difficulty: payload.difficulty,
             questionCount: payload.questionCount,
+            fullInterview: payload.fullInterview,
             resumeId: resume?._id || null,
             jobMatchId: payload.jobMatchId || null,
             creditReservationId: reservation._id,
@@ -236,7 +246,9 @@ export const startInterviewSession = async ({
             questionCount: session.questionCount,
             questionIndex: 0,
             question: session.turns[0].question,
-            creditCost: reservedCredits
+            creditCost: reservedCredits,
+            startedAt: session.createdAt,
+            fullInterview: session.fullInterview
         };
     } catch (error) {
         await refundReservation({
@@ -304,26 +316,47 @@ export const submitInterviewAnswer = async ({ firebaseUid, sessionId, answer }) 
             previous_feedback: turn.evaluation?.feedback?.slice(0, 300) ?? null
         }));
     const completedCount = completedTurns.length + 1;
+    const elapsedMs = Date.now() - session.createdAt.getTime();
+    const turnPayload = {
+        ...toAiConfig(session, resumeContext),
+        completed_turns: completedTurns,
+        current_question: {
+            question: currentTurn.question.question,
+            category: currentTurn.question.category,
+            difficulty: currentTurn.question.difficulty.toLowerCase(),
+            what_it_assesses: currentTurn.question.whatItAssesses || "",
+            evaluation_criteria: currentTurn.question.evaluationCriteria || [],
+            suggested_follow_up: null
+        },
+        answer,
+        completed_count: completedCount,
+        full_interview: session.fullInterview,
+        elapsed_minutes: Math.min(elapsedMs / 60000, 40),
+        time_limit_reached: session.fullInterview &&
+            elapsedMs >= FULL_INTERVIEW_MAX_DURATION_MS
+    };
     let result;
     try {
         result = await callInterviewAI({
             firebaseUid,
             path: "sessions/turn",
-            body: {
-                ...toAiConfig(session, resumeContext),
-                completed_turns: completedTurns,
-                current_question: {
-                    question: currentTurn.question.question,
-                    category: currentTurn.question.category,
-                    difficulty: currentTurn.question.difficulty.toLowerCase(),
-                    what_it_assesses: currentTurn.question.whatItAssesses || "",
-                    evaluation_criteria: currentTurn.question.evaluationCriteria || [],
-                    suggested_follow_up: null
-                },
-                answer,
-                completed_count: completedCount
-            },
+            body: turnPayload
         });
+        if (
+            session.fullInterview &&
+            !result?.is_complete &&
+            Date.now() - session.createdAt.getTime() >= FULL_INTERVIEW_MAX_DURATION_MS
+        ) {
+            result = await callInterviewAI({
+                firebaseUid,
+                path: "sessions/turn",
+                body: {
+                    ...turnPayload,
+                    elapsed_minutes: 40,
+                    time_limit_reached: true
+                }
+            });
+        }
     } catch (error) {
         session.status = "FAILED";
         await session.save();
@@ -377,9 +410,9 @@ export const submitInterviewAnswer = async ({ firebaseUid, sessionId, answer }) 
     }
 
     if (session.status === "COMPLETED") {
-        const capturedCredits = Math.ceil(
-            session.reservedCredits * completedCount / session.questionCount
-        );
+        const capturedCredits = session.fullInterview
+            ? session.reservedCredits
+            : Math.ceil(session.reservedCredits * completedCount / session.questionCount);
         await settleReservation({
             reservationId: session.creditReservationId,
             capturedCredits,
@@ -420,9 +453,15 @@ export const abandonInterviewSession = async ({ firebaseUid, sessionId }) => {
     }
 
     const answeredCount = session.turns.filter((turn) => turn.answer).length;
-    const chargedCredits = answeredCount === 0
-        ? 0
-        : Math.ceil(session.reservedCredits * answeredCount / session.questionCount);
+    const elapsedMs = Math.max(0, Date.now() - session.createdAt.getTime());
+    const chargedCredits = calculateInterviewCharge({
+        reservedCredits: session.reservedCredits,
+        answeredCount,
+        questionCount: session.questionCount,
+        fullInterview: session.fullInterview,
+        elapsedMs,
+        maxDurationMs: FULL_INTERVIEW_MAX_DURATION_MS
+    });
     await settleReservation({
         reservationId: session.creditReservationId,
         capturedCredits: chargedCredits,
@@ -444,7 +483,7 @@ export const getCompletedInterviewSessions = async (firebaseUid) => {
     })
         .sort({ createdAt: -1 })
         .limit(20)
-        .select("role type difficulty questionCount turns report createdAt")
+        .select("role type difficulty questionCount fullInterview turns report createdAt")
         .lean();
 
     return sessions.map((session) => ({
@@ -453,6 +492,7 @@ export const getCompletedInterviewSessions = async (firebaseUid) => {
         type: session.type,
         difficulty: session.difficulty,
         questionCount: session.questionCount,
+        fullInterview: session.fullInterview,
         answeredCount: session.turns.filter((turn) => turn.answer).length,
         status: session.status,
         overallScore: session.report?.overallScore ?? null,

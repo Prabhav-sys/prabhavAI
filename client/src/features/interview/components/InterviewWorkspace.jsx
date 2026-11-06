@@ -9,6 +9,7 @@ const getSpeechRecognition = () => {
 
 function InterviewWorkspace({
     config,
+    startedAt,
     questions,
     questionIndex,
     answer,
@@ -25,8 +26,27 @@ function InterviewWorkspace({
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [interimTranscript, setInterimTranscript] = useState("");
     const [voiceMessage, setVoiceMessage] = useState("");
+    const [elapsedSeconds, setElapsedSeconds] = useState(0);
     const [voiceSupported] = useState(() => Boolean(getSpeechRecognition()));
-    const progress = ((questionIndex + 1) / config.questionCount) * 100;
+    const progress = config.fullInterview
+        ? Math.min((elapsedSeconds / (40 * 60)) * 100, 100)
+        : ((questionIndex + 1) / config.questionCount) * 100;
+
+    useEffect(() => {
+        if (!config.fullInterview || !startedAt) return undefined;
+        const updateElapsed = () => {
+            setElapsedSeconds(Math.max(
+                0,
+                Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000)
+            ));
+        };
+        updateElapsed();
+        const timer = window.setInterval(updateElapsed, 1000);
+        return () => window.clearInterval(timer);
+    }, [config.fullInterview, startedAt]);
+
+    const timeLimitReached = config.fullInterview && elapsedSeconds >= 40 * 60;
+    const elapsedLabel = `${String(Math.floor(elapsedSeconds / 60)).padStart(2, "0")}:${String(elapsedSeconds % 60).padStart(2, "0")}`;
 
     useEffect(() => {
         mountedRef.current = true;
@@ -172,7 +192,11 @@ function InterviewWorkspace({
                     </div>
                 </div>
                 <div className="interview-room-progress">
-                    <span>QUESTION {questionIndex + 1} OF UP TO {config.questionCount}</span>
+                    <span>
+                        {config.fullInterview
+                            ? `${elapsedLabel} elapsed · 40:00 maximum`
+                            : `QUESTION ${questionIndex + 1} OF UP TO ${config.questionCount}`}
+                    </span>
                     <div
                         className="interview-progress"
                         role="progressbar"
@@ -193,6 +217,12 @@ function InterviewWorkspace({
                     End interview
                 </Button>
             </header>
+
+            {timeLimitReached && (
+                <p className="full-interview-time-limit" role="status">
+                    The 40-minute limit has been reached. Submit your current answer to receive your final evaluation, or end the interview now.
+                </p>
+            )}
 
             <div className="interview-room-body">
                 <section className="interviewer-stage" aria-label="AI interviewer">

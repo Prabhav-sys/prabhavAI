@@ -33,6 +33,7 @@ class InterviewSessionStartRequest(BaseModel):
     interview_type: Literal["technical", "behavioral", "mixed", "system_design"] = "mixed"
     difficulty: Literal["easy", "medium", "hard", "mixed"] = "mixed"
     question_count: int = Field(default=5, ge=2, le=20)
+    full_interview: bool = False
     resume_context: str | None = Field(default=None, max_length=12000)
 
 
@@ -65,10 +66,13 @@ class InterviewTurnRequest(BaseModel):
     interview_type: Literal["technical", "behavioral", "mixed", "system_design"]
     difficulty: Literal["easy", "medium", "hard", "mixed"]
     question_count: int = Field(ge=2, le=20)
-    completed_turns: list[InterviewTurn] = Field(default_factory=list, max_length=19)
+    completed_turns: list[InterviewTurn] = Field(default_factory=list)
     current_question: InterviewQuestion
     answer: str = Field(min_length=1, max_length=5000)
-    completed_count: int = Field(ge=1, le=20)
+    completed_count: int = Field(ge=1)
+    full_interview: bool = False
+    elapsed_minutes: float = Field(default=0, ge=0, le=40)
+    time_limit_reached: bool = False
     resume_context: str | None = Field(default=None, max_length=12000)
 
 

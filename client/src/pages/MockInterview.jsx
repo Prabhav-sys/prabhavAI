@@ -26,6 +26,7 @@ const initialConfig = {
     type: "Technical",
     difficulty: "Medium",
     questionCount: 5,
+    fullInterview: false,
     resumeId: "",
     jobMatchId: ""
 };
@@ -59,6 +60,7 @@ function MockInterview() {
     const [questions, setQuestions] = useState([]);
     const [evaluations, setEvaluations] = useState({});
     const [sessionId, setSessionId] = useState(null);
+    const [sessionStartedAt, setSessionStartedAt] = useState(null);
     const [report, setReport] = useState(null);
     const [loading, setLoading] = useState(false);
     const [resumes, setResumes] = useState([]);
@@ -129,6 +131,7 @@ function MockInterview() {
         try {
             const result = await startInterviewSession(config);
             setSessionId(result.sessionId);
+            setSessionStartedAt(result.startedAt);
             setQuestions([result.question]);
             setQuestionIndex(0);
             setAnswers({});
@@ -192,7 +195,9 @@ function MockInterview() {
 
     const endInterview = async () => {
         if (!sessionId || !window.confirm(
-            "End this interview? You’ll only be charged for completed responses."
+            config.fullInterview
+                ? "End this interview? The 100-credit reservation is prorated by time; no credits are charged if you have not submitted an answer."
+                : "End this interview? You’ll only be charged for completed responses."
         )) return;
         setLoading(true);
         try {
@@ -200,11 +205,14 @@ function MockInterview() {
             refreshCreditBalance();
             showNotification(
                 result.chargedCredits
-                    ? `Interview ended. ${result.chargedCredits} credits were used for completed answers.`
+                    ? config.fullInterview
+                        ? `Interview ended. ${result.chargedCredits} credits were charged based on elapsed time.`
+                        : `Interview ended. ${result.chargedCredits} credits were used for completed answers.`
                     : "Interview ended. All reserved credits were released.",
                 "success"
             );
             setSessionId(null);
+            setSessionStartedAt(null);
             setStage("setup");
         } catch (error) {
             showNotification(
@@ -224,6 +232,7 @@ function MockInterview() {
         setEvaluations({});
         setQuestions([]);
         setSessionId(null);
+        setSessionStartedAt(null);
         setReport(null);
         setStage("setup");
     };
@@ -233,7 +242,7 @@ function MockInterview() {
 
             <PageHeader
                 title="AI Interview"
-                description="Step into a realistic interview tailored to your role and experience."
+                description="Follow the steps below to prepare a realistic interview tailored to your role and experience."
             />
 
             {stage === "setup" && (
@@ -263,6 +272,7 @@ function MockInterview() {
                 <InterviewWorkspace
                     key={questionIndex}
                     config={config}
+                    startedAt={sessionStartedAt}
                     questions={questions}
                     questionIndex={questionIndex}
                     answer={currentAnswer}

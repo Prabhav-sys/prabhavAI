@@ -50,6 +50,7 @@ const interviewSessionSchema = new mongoose.Schema(
         type: { type: String, required: true },
         difficulty: { type: String, required: true },
         questionCount: { type: Number, required: true, min: 2, max: 20 },
+        fullInterview: { type: Boolean, default: false },
         idempotencyKey: { type: String },
         creditReservationId: {
             type: mongoose.Schema.Types.ObjectId,

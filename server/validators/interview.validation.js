@@ -12,11 +12,16 @@ export const generateInterviewQuestionsSchema = z.object({
 
 export const startInterviewSessionSchema = generateInterviewQuestionsSchema.extend({
     resumeId: z.string().regex(/^[a-f\d]{24}$/i),
-    questionCount: z.number().int().refine(
-        (value) => [5, 10, 20].includes(value),
-        "Interview length must be 5, 10, or 20 questions."
-    )
-}).strict();
+    questionCount: z.number().int().min(5).max(20),
+    fullInterview: z.boolean().default(false)
+}).strict().superRefine((config, context) => {
+    if (![5, 10, 20].includes(config.questionCount)) {
+        context.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Choose a supported interview length."
+        });
+    }
+});
 
 export const submitInterviewAnswerSchema = z.object({
     answer: z.string().trim().min(1).max(5000)

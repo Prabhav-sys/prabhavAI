@@ -11,11 +11,18 @@ const getLegacyHistoryKey = () => {
     return `prabhavai:interview-history:${userId}`;
 };
 
+const toInterviewPayload = (
+    { resumeId, jobMatchId, fullInterview, ...interviewConfig },
+    includeFullInterview = false
+) => ({
+    ...interviewConfig,
+    ...(resumeId ? { resumeId } : {}),
+    ...(jobMatchId ? { jobMatchId } : {}),
+    ...(includeFullInterview && fullInterview ? { fullInterview } : {})
+});
+
 export const generateInterviewQuestions = async (config) => {
-    const { resumeId, ...interviewConfig } = config;
-    const payload = resumeId
-        ? { ...interviewConfig, resumeId }
-        : interviewConfig;
+    const payload = toInterviewPayload(config);
     const response = await api.post("/interviews/questions", payload, {
         timeout: 180000
     });
@@ -24,8 +31,7 @@ export const generateInterviewQuestions = async (config) => {
 };
 
 export const startInterviewSession = async (config) => {
-    const { resumeId, ...interviewConfig } = config;
-    const payload = resumeId ? { ...interviewConfig, resumeId } : interviewConfig;
+    const payload = toInterviewPayload(config, true);
     const response = await api.post("/interviews/sessions", payload, {
         timeout: 180000,
         headers: { "Idempotency-Key": window.crypto.randomUUID() }

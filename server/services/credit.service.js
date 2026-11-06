@@ -17,7 +17,7 @@ const featureCosts = Object.freeze({
     RESUME_ANALYSIS: 35,
     RESUME_REANALYSIS: 20,
     JOB_MATCH: 15,
-    INTERVIEW: Object.freeze({ 5: 30, 10: 50, 20: 85 })
+    INTERVIEW: Object.freeze({ 5: 30, 10: 50, 20: 85, full: 100 })
 });
 
 export const creditPackages = Object.freeze([
@@ -41,15 +41,37 @@ const withTransaction = async (operation) => {
     }
 };
 
-export const getFeatureCost = (feature, questionCount) => {
+export const getFeatureCost = (feature, questionCount, fullInterview = false) => {
     if (feature === "INTERVIEW") {
-        const cost = featureCosts.INTERVIEW[questionCount];
+        const cost = fullInterview
+            ? featureCosts.INTERVIEW.full
+            : featureCosts.INTERVIEW[questionCount];
         if (!cost) throw new Error("Unsupported interview length.");
         return cost;
     }
     const cost = featureCosts[feature];
     if (!cost) throw new Error("Unsupported credit feature.");
     return cost;
+};
+
+export const calculateInterviewCharge = ({
+    reservedCredits,
+    answeredCount,
+    questionCount,
+    fullInterview = false,
+    elapsedMs = 0,
+    maxDurationMs
+}) => {
+    if (answeredCount <= 0) return 0;
+    if (!fullInterview) {
+        return Math.ceil(reservedCredits * answeredCount / questionCount);
+    }
+    if (!Number.isFinite(maxDurationMs) || maxDurationMs <= 0) {
+        throw new Error("A positive maximum duration is required for full interviews.");
+    }
+    return Math.ceil(
+        reservedCredits * Math.min(Math.max(elapsedMs, 0) / maxDurationMs, 1)
+    );
 };
 
 export const getCreditPricing = () => ({

@@ -13,12 +13,14 @@ function WelcomeSection({ name, hasResume }) {
                 </h1>
 
                 <p>
-                    Build confidence, improve your skills and get interview-ready.
+                    {hasResume
+                        ? "Set up a role-focused practice session from your analyzed resume. Job matching is optional."
+                        : "Analyze a resume first, then set up a role-focused AI interview."}
                 </p>
             </div>
 
             <Link to={hasResume ? "/mock-interview" : "/resume-analysis"}>
-                <Button>{hasResume ? "Start an Interview" : "Analyze your resume"}</Button>
+                <Button>{hasResume ? "Set up an Interview" : "Analyze your resume"}</Button>
             </Link>
         </section>
     );

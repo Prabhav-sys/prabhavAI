@@ -725,21 +725,21 @@ a {
     min-width: 52px;
     height: 100%;
     flex: 1;
-    grid-template-rows: 18px 1fr 18px 14px;
+    grid-template-rows: 22px 1fr 20px 18px;
     justify-items: center;
-    gap: 6px;
+    gap: 8px;
     color: #768096;
-    font-size: 9px;
+    font-size: 12px;
 }
 
 .performance-month > strong {
     color: #454acb;
-    font-size: 11px;
+    font-size: 16px;
 }
 
 .performance-month > strong small {
     color: #8c91a3;
-    font-size: 8px;
+    font-size: 11px;
 }
 
 .performance-bar-track {
@@ -764,13 +764,13 @@ a {
 }
 
 .performance-month > small {
-    font-size: 8px;
+    font-size: 10px;
 }
 
 .performance-empty {
     margin: 0;
     color: var(--color-muted);
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.6;
 }
 

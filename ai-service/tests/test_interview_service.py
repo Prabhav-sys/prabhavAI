@@ -28,11 +28,35 @@ def test_interview_turn_request_accepts_twenty_question_sessions():
     assert request.question_count == 20
 
 
+def test_full_interview_turn_request_accepts_time_limit_fields():
+    request = InterviewTurnRequest(
+        role="Backend Engineer",
+        experience_level="mid",
+        interview_type="technical",
+        difficulty="hard",
+        question_count=5,
+        full_interview=True,
+        elapsed_minutes=40,
+        time_limit_reached=True,
+        current_question={
+            "question": "Describe a system design decision.",
+            "category": "Architecture",
+            "difficulty": "hard",
+            "what_it_assesses": "Technical judgment",
+        },
+        answer="I chose an approach based on the requirements.",
+        completed_count=16,
+    )
+    assert request.full_interview is True
+    assert request.time_limit_reached is True
+
+
 @pytest.mark.asyncio
 async def test_start_interview_generates_personalized_opening_question(monkeypatch):
     async def fake_complete_json(**kwargs):
         assert "resume evidence" in kwargs["user"].lower()
         assert "Cloud migration" in kwargs["user"]
+        assert "no planned question count" in kwargs["user"]
         return {
             "question": {
                 "question": "Tell me about the cloud migration you led.",
@@ -51,6 +75,7 @@ async def test_start_interview_generates_personalized_opening_question(monkeypat
             interview_type="technical",
             difficulty="medium",
             question_count=5,
+            full_interview=True,
             resume_context="Cloud migration project",
         )
     )
@@ -151,7 +176,7 @@ async def test_interview_turn_requires_final_report_at_response_limit(monkeypatc
         completed_count=2,
     )
 
-    with pytest.raises(RuntimeError, match="response limit"):
+    with pytest.raises(RuntimeError, match="configured limit"):
         await evaluate_interview_turn(request)
 
 
@@ -199,3 +224,49 @@ async def test_last_interview_turn_returns_a_final_report(monkeypatch):
     assert result.is_complete is True
     assert result.final_report.overall_score == 4
     assert result.next_question is None
+
+
+@pytest.mark.asyncio
+async def test_full_interview_requires_final_report_when_time_limit_is_reached(monkeypatch):
+    async def fake_complete_json(**kwargs):
+        assert "Time limit reached: True" in kwargs["user"]
+        return {
+            "evaluation": {
+                "score": 3,
+                "feedback": "Reasonable answer.",
+                "strengths": [],
+                "improvements": [],
+            },
+            "is_complete": False,
+            "next_question": {
+                "question": "Continue?",
+                "category": "General",
+                "difficulty": "medium",
+                "what_it_assesses": "Depth",
+                "evaluation_criteria": [],
+            },
+            "final_report": None,
+        }
+
+    monkeypatch.setattr(llm_service, "complete_json", fake_complete_json)
+    with pytest.raises(RuntimeError, match="configured limit"):
+        await evaluate_interview_turn(
+            InterviewTurnRequest(
+                role="Backend Engineer",
+                experience_level="mid",
+                interview_type="technical",
+                difficulty="medium",
+                question_count=5,
+                full_interview=True,
+                elapsed_minutes=40,
+                time_limit_reached=True,
+                current_question={
+                    "question": "Explain a design choice.",
+                    "category": "Architecture",
+                    "difficulty": "medium",
+                    "what_it_assesses": "Judgment",
+                },
+                answer="I evaluated the trade-offs and chose the simpler design.",
+                completed_count=16,
+            )
+        )

@@ -27,8 +27,13 @@ function InterviewSetup({
                     <span className="setup-eyebrow">YOUR NEXT PRACTICE SESSION</span>
                     <h2>Meet your AI interviewer</h2>
                     <p>
-                        Start from your analyzed resume. Add a job match when you want the conversation tailored to a specific job post.
+                        You’ll set up your interview here before it begins. An analyzed resume is required; adding a job match is optional.
                     </p>
+                    <ol className="interview-setup-steps">
+                        <li><strong>Select an analyzed resume</strong> to give the interviewer context about your experience.</li>
+                        <li><strong>Optionally add a job match</strong> to tailor questions to a specific job description.</li>
+                        <li><strong>Choose a role and interview settings</strong>, then prepare your session.</li>
+                    </ol>
                     {resumeName && (
                         <p className="resume-context-note">
                             Resume context: <strong>{resumeName}</strong>. Questions will be tailored to the experience you shared.
@@ -132,24 +137,50 @@ function InterviewSetup({
                     </div>
 
                     <div className="interview-field">
-                        <label>Number of Questions</label>
-
+                        <label htmlFor="interview-format">Interview Format</label>
                         <select
-                            value={config.questionCount}
-                            onChange={(e) =>
-                                updateConfig(
-                                    "questionCount",
-                                    Number(e.target.value)
-                                )
-                            }
+                            id="interview-format"
+                            value={config.fullInterview ? "full" : "standard"}
+                            onChange={(event) => {
+                                const fullInterview = event.target.value === "full";
+                                setConfig((previous) => ({
+                                    ...previous,
+                                    fullInterview
+                                }));
+                            }}
                         >
-                            <option value={5}>5 Questions</option>
-                            <option value={10}>10 Questions</option>
-                            <option value={20}>20 Questions</option>
+                            <option value="standard">Standard interview</option>
+                            <option value="full">Full interview · 100 credits</option>
                         </select>
                     </div>
 
+                    {!config.fullInterview && (
+                        <div className="interview-field">
+                            <label htmlFor="interview-question-count">Number of Questions</label>
+                            <select
+                                id="interview-question-count"
+                                value={config.questionCount}
+                                onChange={(event) =>
+                                    updateConfig("questionCount", Number(event.target.value))
+                                }
+                            >
+                                <option value={5}>5 Questions</option>
+                                <option value={10}>10 Questions</option>
+                                <option value={20}>20 Questions</option>
+                            </select>
+                        </div>
+                    )}
+
                 </div>
+
+                {config.fullInterview && (
+                    <div className="full-interview-note">
+                        <strong>A rigorous, role-focused interview with no preset question count.</strong>
+                        <p>
+                            The interviewer will probe your answers and continue naturally, up to a 40-minute maximum. It costs 100 credits; ending early is prorated by time, with no charge before your first submitted answer.
+                        </p>
+                    </div>
+                )}
 
                 <div className="voice-session-note">
                     <span className="voice-session-icon" aria-hidden="true">⌁</span>
@@ -161,13 +192,15 @@ function InterviewSetup({
                     </div>
                 </div>
 
-                <p className="interview-credit-cost">
-                    This {config.questionCount}-question interview reserves{" "}
-                    <strong>
-                        {config.questionCount === 5 ? 30 : config.questionCount === 10 ? 50 : 85} credits
-                    </strong>
-                    . Unused credits are released if you finish early.
-                </p>
+                {!config.fullInterview && (
+                    <p className="interview-credit-cost">
+                        This {config.questionCount}-question interview reserves{" "}
+                        <strong>
+                            {config.questionCount === 5 ? 30 : config.questionCount === 10 ? 50 : 85} credits
+                        </strong>
+                        . Unused credits are released if you finish early.
+                    </p>
+                )}
 
                 <div className="interview-setup-footer">
                     <p>

@@ -15,8 +15,8 @@ const actions = [
         symbol: "⌕"
     },
     {
-        title: "3. Start an AI interview",
-        description: "Practice by voice with adaptive questions grounded in your resume.",
+        title: "3. Set up an AI interview",
+        description: "Choose your role and interview settings. Your analyzed resume is required; job matching is optional.",
         path: "/mock-interview",
         symbol: "◎"
     }
