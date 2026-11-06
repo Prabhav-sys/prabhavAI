@@ -10,6 +10,10 @@ export const uploadResume = async (file, onUploadProgress) => {
         formData,
         {
             timeout: 180000,
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Idempotency-Key": window.crypto.randomUUID()
+            },
             onUploadProgress
         }
     );
@@ -24,6 +28,18 @@ export const getMyResumes = async () => {
 
 export const getResume = async (resumeId) => {
     const response = await api.get(`/resumes/${resumeId}`);
+    return response.data.data;
+};
+
+export const reanalyzeResume = async (resumeId) => {
+    const response = await api.post(
+        `/resumes/${resumeId}/reanalyze`,
+        {},
+        {
+            timeout: 180000,
+            headers: { "Idempotency-Key": window.crypto.randomUUID() }
+        }
+    );
     return response.data.data;
 };
 

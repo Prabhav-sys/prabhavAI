@@ -3,22 +3,22 @@ import { Link } from "react-router-dom";
 import Card from "./ui/Card";
 const actions = [
     {
-        title: "Analyze Resume",
-        description: "Upload your resume and discover areas for improvement.",
+        title: "1. Analyze your resume",
+        description: "Create your candidate profile and the context the AI interviewer will use.",
         path: "/resume-analysis",
         symbol: "▤"
     },
     {
-        title: "Start Mock Interview",
-        description: "Practice answering questions in a simulated interview.",
-        path: "/mock-interview",
-        symbol: "◎"
+        title: "2. Optional job fit",
+        description: "Compare your resume with one job description to add role-specific interview context.",
+        path: "/job-matching",
+        symbol: "⌕"
     },
     {
-        title: "View Interview History",
-        description: "Review your previous interview sessions and feedback.",
-        path: "/interview-history",
-        symbol: "◷"
+        title: "3. Start an AI interview",
+        description: "Practice by voice with adaptive questions grounded in your resume.",
+        path: "/mock-interview",
+        symbol: "◎"
     }
 ];
 

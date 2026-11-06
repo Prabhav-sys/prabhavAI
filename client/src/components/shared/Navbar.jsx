@@ -1,4 +1,5 @@
 
+import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useAuth } from "../../context/AuthContext";
 
@@ -16,16 +17,14 @@ function Navbar() {
 
     return (
         <header className="dashboard-navbar">
-            <div className="navbar-title">
-                prabhavAI Workspace
-            </div>
+            <div className="navbar-title">prabhavAI Interview Workspace</div>
 
             <div className="navbar-user">
                 <span>{user?.name || "User"}</span>
 
-                <span className="navbar-credits">
+                <Link className="navbar-credits" to="/credits">
                     {user?.credits ?? 0} Credits
-                </span>
+                </Link>
 
                 <button onClick={handleLogout}>
                     Logout

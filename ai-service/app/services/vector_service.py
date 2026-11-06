@@ -16,6 +16,7 @@ def get_qdrant_client() -> QdrantClient:
     return QdrantClient(url=settings.qdrant_url, api_key=settings.qdrant_api_key.get_secret_value(), timeout=20)
 
 
+@lru_cache(maxsize=1)
 def ensure_collection() -> None:
     client = get_qdrant_client()
     names = {item.name for item in client.get_collections().collections}
@@ -24,6 +25,16 @@ def ensure_collection() -> None:
             collection_name=settings.qdrant_collection,
             vectors_config=models.VectorParams(size=settings.embedding_dimension, distance=models.Distance.COSINE),
         )
+
+    payload_schema = client.get_collection(settings.qdrant_collection).payload_schema or {}
+    for field_name in ("user_id", "resume_id"):
+        if field_name not in payload_schema:
+            client.create_payload_index(
+                collection_name=settings.qdrant_collection,
+                field_name=field_name,
+                field_schema=models.PayloadSchemaType.KEYWORD,
+                wait=True,
+            )
 
 
 def index_chunks(*, user_id: str, resume_id: str, chunks: list[str]) -> int:

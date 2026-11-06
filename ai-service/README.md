@@ -33,7 +33,7 @@ Edit `.env` and add rotated credentials. Generate the internal key:
 python -c "import secrets; print(secrets.token_urlsafe(48))"
 ```
 
-Set that value as `INTERNAL_API_KEY` in this service and in the Node backend's server-side environment as `AI_SERVICE_INTERNAL_API_KEY`. Set `AI_SERVICE_URL=http://127.0.0.1:8001` in Node.
+Set that value as `INTERNAL_API_KEY` in this service and as `AI_SERVICE_API_KEY` in the Node backend's server-side environment. These values must match. Set `AI_SERVICE_URL=http://127.0.0.1:8001` in Node.
 
 Start the service:
 
@@ -55,13 +55,19 @@ Readiness: http://127.0.0.1:8001/api/v1/health/ready
 | POST | `/api/v1/resumes/search` | Semantic search over a user's indexed resume chunks |
 | DELETE | `/api/v1/resumes/{resume_id}` | Delete indexed chunks for a user/resume |
 | POST | `/api/v1/interviews/questions` | Generate structured interview questions |
+| POST | `/api/v1/interviews/sessions/start` | Generate a personalized opening question |
+| POST | `/api/v1/interviews/sessions/turn` | Evaluate an answer and adapt the next question or final report |
 | POST | `/api/v1/research/search` | Tavily search + optional LLM synthesis |
 
 All protected endpoints require `X-Internal-API-Key` and `X-User-ID`. The Node backend must verify Firebase identity and ownership before forwarding the authenticated user's ID. Never expose this service directly to browsers.
 
+The interview session endpoints are turn-based: the browser handles optional speech recognition and speech playback, while Node persists the session and forwards the transcript to this service for evaluation and the next adaptive question. Raw interview audio is not sent to this service.
+
 ## Important integration contract
 
 `POST /resumes/analyze` returns structured analysis and a generated `resume_id` if one was not supplied. The Node backend should persist the resume metadata, status, analysis and ownership in MongoDB. This service indexes chunks in Qdrant using `user_id` and `resume_id` payload fields. Deletion must be coordinated by Node when a resume is deleted.
+
+When a user prepares an interview from a completed resume, Node verifies resume ownership, retrieves role-relevant chunks through `/resumes/search`, and sends that evidence with the interview request. Resume text is treated as untrusted context by the question-generation prompt.
 
 ## Tests and quality
 

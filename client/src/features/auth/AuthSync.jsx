@@ -40,7 +40,11 @@ function AuthSync() {
                 console.error("Authentication synchronization failed:", error);
 
                 if (active) {
-                    dispatch(setAuthError(error.message));
+                    dispatch(setAuthError(
+                        error.response?.data?.message ||
+                        error.message ||
+                        "Could not synchronize your account with the backend."
+                    ));
                 }
             }
         };

@@ -1,5 +1,6 @@
 
 import User from "../models/User.js";
+import { ensureCreditWallet } from "./credit.service.js";
 
 import {
     NotFoundError,
@@ -53,7 +54,7 @@ export const getAllUsers = async ({
     // Fetch records and count in parallel
     const [users, total] = await Promise.all([
         User.find(filter)
-            .select("name email avatarUrl createdAt")
+            .select("name email avatarUrl role credits createdAt")
             .sort(sort)
             .skip(skip)
             .limit(limit)
@@ -79,6 +80,7 @@ export const getUserById = async (userId) => {
         throw new NotFoundError("User not found");
     }
 
+    await ensureCreditWallet(user.firebaseUid);
     return user;
 };
 
@@ -180,7 +182,7 @@ export const syncFirebaseUser = async ({
                 const existingUser = await User.findOne({ firebaseUid });
 
                 if (existingUser) {
-                    return User.findOneAndUpdate(
+                    const user = await User.findOneAndUpdate(
                         { firebaseUid },
                         {
                             $set: {
@@ -194,6 +196,8 @@ export const syncFirebaseUser = async ({
                             runValidators: true
                         }
                     );
+                    await ensureCreditWallet(firebaseUid);
+                    return user;
                 }
             }
         }

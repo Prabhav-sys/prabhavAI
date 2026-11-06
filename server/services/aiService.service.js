@@ -1,6 +1,7 @@
 
 import fs from "fs/promises";
 import env from "../config/env.js";
+import AppError from "../utils/AppError.js";
 
 const AI_TIMEOUT_MS = 120000;
 
@@ -62,6 +63,56 @@ export const analyzeResumeWithAI = async ({
     } finally {
         clearTimeout(timeout);
     }
+};
+
+export const searchResumeContext = async ({
+    firebaseUid,
+    resumeId,
+    query
+}) => {
+    let response;
+
+    try {
+        response = await fetch(
+            `${env.aiServiceUrl}/api/v1/resumes/search`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Internal-API-Key": env.aiServiceApiKey,
+                    "X-User-ID": firebaseUid
+                },
+                body: JSON.stringify({
+                    query,
+                    resume_id: resumeId,
+                    limit: 8
+                }),
+                signal: AbortSignal.timeout(30000)
+            }
+        );
+    } catch (error) {
+        const serviceError = new AppError(
+            "AI resume search service is unavailable.",
+            502
+        );
+        serviceError.cause = error;
+        throw serviceError;
+    }
+
+    const results = await response.json().catch(() => null);
+
+    if (
+        !response.ok ||
+        !Array.isArray(results) ||
+        results.some((result) => typeof result?.text !== "string")
+    ) {
+        throw new AppError(
+            "Could not retrieve resume context for the interview.",
+            502
+        );
+    }
+
+    return results.map((result) => result.text);
 };
 
 // Delete resume vector index from AI service.

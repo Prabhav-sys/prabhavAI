@@ -1,8 +1,17 @@
 
+import { Link } from "react-router-dom";
 import Card from "../../../components/ui/Card";
 import Button from "../../../components/ui/Button";
 
-function InterviewSetup({ config, setConfig, onStart }) {
+function InterviewSetup({
+    config,
+    setConfig,
+    onStart,
+    loading,
+    resumeName,
+    resumes,
+    onResumeChange
+}) {
     const updateConfig = (field, value) => {
         setConfig((previous) => ({
             ...previous,
@@ -15,11 +24,50 @@ function InterviewSetup({ config, setConfig, onStart }) {
 
             <Card>
                 <div className="interview-section-heading">
-                    <h2>Configure Your Interview</h2>
+                    <span className="setup-eyebrow">YOUR NEXT PRACTICE SESSION</span>
+                    <h2>Meet your AI interviewer</h2>
                     <p>
-                        Customize your interview according to your career goals.
+                        Start from your analyzed resume. Add a job match when you want the conversation tailored to a specific job post.
                     </p>
+                    {resumeName && (
+                        <p className="resume-context-note">
+                            Resume context: <strong>{resumeName}</strong>. Questions will be tailored to the experience you shared.
+                        </p>
+                    )}
                 </div>
+
+                {!loading && resumes.length === 0 ? (
+                    <div className="interview-resume-required">
+                        <span aria-hidden="true">01</span>
+                        <div>
+                            <strong>Your resume is the interviewer's context</strong>
+                            <p>Analyze a resume first so the AI can ground questions and follow-ups in your actual experience.</p>
+                            <Link to="/resume-analysis"><Button>Analyze a resume →</Button></Link>
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        <div className="interview-resume-select">
+                            <label htmlFor="interview-resume">Interview from resume</label>
+                            <select
+                                id="interview-resume"
+                                value={config.resumeId}
+                                onChange={(event) => onResumeChange(event.target.value)}
+                                disabled={loading}
+                                required
+                            >
+                                {resumes.map((resume) => (
+                                    <option key={resume._id} value={resume._id}>
+                                        {resume.originalName}
+                                    </option>
+                                ))}
+                            </select>
+                            <span>
+                                {config.jobMatchId
+                                    ? "This interview also includes the selected job description."
+                                    : "Job matching is optional; your resume is always used."}
+                            </span>
+                        </div>
 
                 <div className="interview-form-grid">
 
@@ -28,6 +76,7 @@ function InterviewSetup({ config, setConfig, onStart }) {
 
                         <input
                             value={config.role}
+                            maxLength={120}
                             onChange={(e) =>
                                 updateConfig("role", e.target.value)
                             }
@@ -96,24 +145,44 @@ function InterviewSetup({ config, setConfig, onStart }) {
                         >
                             <option value={5}>5 Questions</option>
                             <option value={10}>10 Questions</option>
-                            <option value={15}>15 Questions</option>
+                            <option value={20}>20 Questions</option>
                         </select>
                     </div>
 
                 </div>
 
+                <div className="voice-session-note">
+                    <span className="voice-session-icon" aria-hidden="true">⌁</span>
+                    <div>
+                        <strong>A voice-first interview, on your terms</strong>
+                        <p>
+                            Hear questions aloud and answer by speaking or typing. Microphone permission is requested only if you choose speech. Submitted transcripts are sent to the AI interviewer and saved to your account for feedback; this app does not store audio recordings.
+                        </p>
+                    </div>
+                </div>
+
+                <p className="interview-credit-cost">
+                    This {config.questionCount}-question interview reserves{" "}
+                    <strong>
+                        {config.questionCount === 5 ? 30 : config.questionCount === 10 ? 50 : 85} credits
+                    </strong>
+                    . Unused credits are released if you finish early.
+                </p>
+
                 <div className="interview-setup-footer">
                     <p>
-                        Your interview will be configured using these preferences.
+                        You can pause, use text instead, or stop at any time.
                     </p>
 
                     <Button
                         onClick={onStart}
-                        disabled={!config.role.trim()}
+                        disabled={!config.role.trim() || !config.resumeId || loading}
                     >
-                        Start Mock Interview →
+                        {loading ? "Preparing your interview..." : "Prepare my interview →"}
                     </Button>
                 </div>
+                    </>
+                )}
             </Card>
 
         </div>

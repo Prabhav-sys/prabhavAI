@@ -24,7 +24,9 @@ export function NotificationProvider({ children }) {
     }, []);
 
     return (
-        <NotificationContext.Provider value={{ notify, dismiss }}>
+        <NotificationContext.Provider
+            value={{ showNotification: notify, dismiss }}
+        >
             {children}
 
             {notification && (

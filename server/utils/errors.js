@@ -35,3 +35,12 @@ export class ValidationError extends AppError {
         super(message, 422, errors);
     }
 }
+
+export class InsufficientCreditsError extends AppError {
+    constructor(requiredCredits, availableCredits) {
+        super("You do not have enough credits to start this AI feature.", 402);
+        this.code = "INSUFFICIENT_CREDITS";
+        this.requiredCredits = requiredCredits;
+        this.availableCredits = availableCredits;
+    }
+}

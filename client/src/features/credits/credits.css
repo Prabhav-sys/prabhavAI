@@ -1,0 +1,349 @@
+.credits-page {
+    display: grid;
+    gap: 28px;
+    padding-bottom: 48px;
+}
+
+.credits-loading,
+.credits-empty {
+    padding: 22px;
+    border: 1px solid #e8eaf0;
+    border-radius: 12px;
+    background: #fff;
+    color: #70768a;
+    font-size: 13px;
+}
+
+.credits-balance-card {
+    display: flex;
+    min-height: 170px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px 32px;
+    border-radius: 18px;
+    background:
+        radial-gradient(circle at 85% 20%, rgba(255, 255, 255, .16), transparent 30%),
+        linear-gradient(115deg, #303dc8, #7255db);
+    box-shadow: 0 16px 38px rgba(67, 69, 188, .18);
+    color: #fff;
+}
+
+.credits-balance-card > div:first-child {
+    display: grid;
+    gap: 5px;
+}
+
+.credits-eyebrow {
+    color: #858ba0;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: .11em;
+}
+
+.credits-balance-card .credits-eyebrow,
+.credits-balance-card > div:first-child > span:last-child {
+    color: rgba(255, 255, 255, .78);
+}
+
+.credits-balance-card > div:first-child > strong {
+    font-size: clamp(42px, 7vw, 64px);
+    line-height: 1;
+    letter-spacing: -.06em;
+}
+
+.credits-monthly-usage {
+    display: grid;
+    min-width: 220px;
+    gap: 8px;
+    padding: 20px;
+    border: 1px solid rgba(255, 255, 255, .22);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .1);
+}
+
+.credits-monthly-usage > span {
+    color: rgba(255, 255, 255, .74);
+    font-size: 11px;
+}
+
+.credits-monthly-usage > strong {
+    font-size: 15px;
+}
+
+.credits-monthly-usage > a {
+    color: #fff;
+    font-size: 11px;
+    text-decoration: none;
+}
+
+.credits-section {
+    display: grid;
+    gap: 16px;
+}
+
+.credits-section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.credits-section-heading > div {
+    display: grid;
+    gap: 5px;
+}
+
+.credits-section-heading h2 {
+    margin: 0;
+    color: #20243a;
+    font-size: 20px;
+    letter-spacing: -.025em;
+}
+
+.credits-section-heading > p,
+.credits-section-heading > .credits-mode {
+    margin: 0 0 2px;
+    color: #777d90;
+    font-size: 11px;
+}
+
+.credits-mode {
+    padding: 7px 10px;
+    border-radius: 20px;
+    background: #f0efff;
+    color: #594cc3 !important;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.credits-mode.is-test {
+    background: #fff5dd;
+    color: #925f00 !important;
+}
+
+.credits-cost-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.credits-cost-item {
+    display: flex;
+    min-height: 66px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid #e8eaf0;
+    border-radius: 11px;
+    background: #fff;
+}
+
+.credits-cost-item > span {
+    color: #50566b;
+    font-size: 11px;
+}
+
+.credits-cost-item strong {
+    flex-shrink: 0;
+    color: #4a4fd0;
+    font-size: 15px;
+}
+
+.credits-cost-item small {
+    color: #888da0;
+    font-size: 9px;
+    font-weight: 500;
+}
+
+.credits-config-note {
+    margin: -4px 0 0;
+    padding: 12px 14px;
+    border: 1px solid #f1dfb8;
+    border-radius: 10px;
+    background: #fffaf0;
+    color: #79550e;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.credits-package-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.credits-package-card {
+    position: relative;
+    display: flex;
+    min-height: 260px;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 22px;
+    border: 1px solid #e8eaf0;
+    border-radius: 14px;
+    background: #fff;
+}
+
+.credits-package-card.is-popular {
+    border-color: #9287ef;
+    box-shadow: 0 8px 26px rgba(94, 82, 205, .1);
+}
+
+.credits-popular-tag {
+    position: absolute;
+    top: 0;
+    right: 16px;
+    padding: 6px 9px;
+    border-radius: 0 0 7px 7px;
+    background: #6253d5;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: .08em;
+}
+
+.credits-package-card h3 {
+    margin: 0 0 16px;
+    color: #30354b;
+    font-size: 14px;
+}
+
+.credits-package-count {
+    color: #20243a;
+    font-size: 34px;
+    letter-spacing: -.05em;
+}
+
+.credits-package-unit {
+    margin-top: 1px;
+    color: #878da0;
+    font-size: 10px;
+}
+
+.credits-package-price {
+    margin: 14px 0;
+    color: #4c51cc;
+    font-size: 21px;
+    font-weight: 750;
+}
+
+.credits-package-card .ui-button {
+    width: 100%;
+    margin-top: auto;
+}
+
+.credits-package-card > small {
+    align-self: center;
+    margin-top: 10px;
+    color: #878da0;
+    font-size: 9px;
+}
+
+.credits-table-wrap {
+    overflow: auto;
+    border: 1px solid #e8eaf0;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.credits-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.credits-table th,
+.credits-table td {
+    padding: 13px 16px;
+    border-bottom: 1px solid #eff0f4;
+    font-size: 11px;
+}
+
+.credits-table th {
+    background: #fafaff;
+    color: #858ba0;
+    font-size: 9px;
+    font-weight: 750;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+}
+
+.credits-table td {
+    color: #53596c;
+}
+
+.credits-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.credits-table .is-debit {
+    color: #bf5560;
+    font-weight: 700;
+}
+
+.credits-table .is-credit {
+    color: #278361;
+    font-weight: 700;
+}
+
+.payment-status {
+    display: inline-flex;
+    padding: 5px 8px;
+    border-radius: 20px;
+    background: #f0f1f5;
+    color: #62687b;
+    font-size: 9px;
+    font-weight: 700;
+}
+
+.payment-status.status-paid {
+    background: #e8f7ef;
+    color: #237b55;
+}
+
+.payment-status.status-failed {
+    background: #fff0ef;
+    color: #b94a48;
+}
+
+@media (max-width: 800px) {
+    .credits-cost-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .credits-package-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .credits-package-card {
+        min-height: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    .credits-balance-card {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 22px;
+    }
+
+    .credits-monthly-usage {
+        min-width: 0;
+    }
+
+    .credits-section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .credits-cost-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .credits-cost-item {
+        min-height: 54px;
+    }
+}

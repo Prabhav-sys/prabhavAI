@@ -24,6 +24,7 @@ import JobMatching from "./pages/JobMatching";
 import MockInterview from "./pages/MockInterview";
 import InterviewHistory from "./pages/InterviewHistory";
 import Profile from "./pages/Profile";
+import Credits from "./pages/Credits";
 
 function App() {
     return (
@@ -80,6 +81,11 @@ function App() {
                         <Route
                             path="/profile"
                             element={<Profile />}
+                        />
+
+                        <Route
+                            path="/credits"
+                            element={<Credits />}
                         />
 
                     </Route>

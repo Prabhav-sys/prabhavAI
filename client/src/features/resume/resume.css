@@ -151,6 +151,64 @@
     margin-top: 12px;
 }
 
+.resume-role-input {
+    display: block;
+    width: 100%;
+    max-width: 420px;
+    margin: 8px 0 16px;
+}
+
+.resume-credit-note {
+    margin: -4px 0 16px;
+    color: var(--color-muted);
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.resume-history-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.resume-history-row:last-child {
+    border-bottom: 0;
+}
+
+.resume-history-row > div:first-child {
+    min-width: 0;
+}
+
+.resume-history-row strong {
+    overflow-wrap: anywhere;
+    font-size: 13px;
+}
+
+.resume-history-row p {
+    margin: 6px 0 3px;
+    color: var(--color-muted);
+    font-size: 11px;
+}
+
+.resume-history-row small {
+    color: var(--color-muted);
+    font-size: 10px;
+}
+
+.resume-history-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.resume-history-actions .ui-button {
+    font-size: 10px;
+}
+
 /* GUIDELINES */
 
 .resume-guidelines h3 {
@@ -219,5 +277,15 @@
 
     .resume-upload-actions button {
         width: 100%;
+    }
+
+    .resume-history-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .resume-history-actions {
+        width: 100%;
+        justify-content: flex-start;
     }
 }

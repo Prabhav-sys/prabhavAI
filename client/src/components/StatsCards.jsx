@@ -1,7 +1,7 @@
 
 import Card from "./ui/Card";
 
-function StatsCards({ credits }) {
+function StatsCards({ credits, metrics = {} }) {
     const stats = [
         {
             title: "Available Credits",
@@ -12,22 +12,24 @@ function StatsCards({ credits }) {
         },
         {
             title: "Resume Analyses",
-            value: "—",
-            description: "Your analysis history will appear here",
+            value: metrics.analyzedResumeCount ?? "—",
+            description: `${metrics.resumeCount ?? 0} resumes in your workspace`,
             symbol: "▤",
             color: "purple"
         },
         {
             title: "Interviews Completed",
-            value: "—",
-            description: "Your completed sessions will appear here",
+            value: metrics.completedInterviewCount ?? "—",
+            description: `${metrics.interviewCount ?? 0} total sessions`,
             symbol: "◎",
             color: "green"
         },
         {
             title: "Average Interview Score",
-            value: "—",
-            description: "Available after your first evaluation",
+            value: metrics.averageInterviewScore == null
+                ? "—"
+                : `${metrics.averageInterviewScore.toFixed(1)}/5`,
+            description: "Average score across completed interviews",
             symbol: "↗",
             color: "orange"
         }

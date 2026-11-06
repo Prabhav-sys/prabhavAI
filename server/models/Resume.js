@@ -66,6 +66,16 @@ const resumeSchema = new mongoose.Schema(
         errorMessage: {
             type: String,
             default: null
+        },
+
+        reanalyzingAt: {
+            type: Date,
+            default: null
+        },
+
+        lastReanalysisKey: {
+            type: String,
+            default: null
         }
     },
     {

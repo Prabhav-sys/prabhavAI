@@ -16,10 +16,33 @@ import requestLogger from "./middleware/requestLogger.middleware.js";
 const app = express();
 
 // CORS Configuration
+const allowedOrigins = new Set(
+    [...(env.clientUrls ?? [env.clientUrl])]
+        .map((value) => value?.trim())
+        .filter(Boolean)
+);
+if (env.nodeEnv !== "production") {
+    allowedOrigins.add("http://localhost:5173");
+    allowedOrigins.add("http://127.0.0.1:5173");
+}
+
 const corsOptions = {
-    origin: env.clientUrl,
+    origin(origin, callback) {
+        if (!origin || allowedOrigins.has(origin)) {
+            callback(null, true);
+            return;
+        }
+
+        callback(new Error("Not allowed by CORS"));
+    },
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: [
+        "Content-Type",
+        "Authorization",
+        "Idempotency-Key",
+        "X-Internal-API-Key",
+        "X-User-ID"
+    ],
     credentials: true
 };
 
@@ -44,7 +67,12 @@ app.use((req, res, next) => {
 
 // 3. Request parsing
 app.use(express.json({
-    limit: "10kb"
+    limit: "128kb",
+    verify(req, res, buffer) {
+        if (req.path === "/api/v1/payments/webhook") {
+            req.rawBody = Buffer.from(buffer);
+        }
+    }
 }));
 
 // Express 5 compatibility for express-mongo-sanitize
@@ -76,7 +104,7 @@ app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get("/api/health", (req, res) => {
     res.status(200).json({
         success: true,
-        message: "InterviewAI backend is running!"
+        message: "prabhavAI backend is running."
     });
 });
 

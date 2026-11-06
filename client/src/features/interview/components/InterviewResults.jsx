@@ -2,7 +2,7 @@
 import Card from "../../../components/ui/Card";
 import Button from "../../../components/ui/Button";
 
-function InterviewResults({ config, answers, onRestart }) {
+function InterviewResults({ config, answers, questions, evaluations, report, onRestart }) {
     const answeredCount = Object.values(answers).filter(
         (answer) => answer.trim().length > 0
     ).length;
@@ -22,42 +22,91 @@ function InterviewResults({ config, answers, onRestart }) {
 
                 <div className="results-summary-grid">
                     <div>
-                        <strong>{config.questionCount}</strong>
-                        <span>Total Questions</span>
+                        <strong>{report?.overallScore ?? "—"}/5</strong>
+                        <span>Overall interview score</span>
                     </div>
 
                     <div>
                         <strong>{answeredCount}</strong>
-                        <span>Questions Answered</span>
+                        <span>Questions discussed</span>
                     </div>
 
                     <div>
-                        <strong>{config.difficulty}</strong>
-                        <span>Difficulty</span>
+                        <strong>{config.experience}</strong>
+                        <span>Interview level</span>
                     </div>
                 </div>
 
-                <p className="results-preview-note">
-                    This is a session summary, not an AI evaluation.
-                    Detailed scoring and feedback will be available
-                    after the interview engine is integrated.
-                </p>
-
                 <Button onClick={onRestart}>
-                    Start Another Interview
+                    Start another interview
                 </Button>
             </Card>
 
-            <Card className="results-answers">
-                <h3>Your Responses</h3>
+            {report && (
+                <Card className="interview-report-card">
+                    <span className="answer-overline">YOUR INTERVIEW REPORT</span>
+                    <h3>Overall feedback</h3>
+                    <p className="report-summary">{report.summary}</p>
+                    <div className="report-columns">
+                        <section>
+                            <h4>What went well</h4>
+                            <ul>
+                                {report.strengths?.map((item, index) => (
+                                    <li key={`strength-${index}`}>{item}</li>
+                                ))}
+                            </ul>
+                        </section>
+                        <section>
+                            <h4>Areas to improve</h4>
+                            <ul>
+                                {report.areasToImprove?.map((item, index) => (
+                                    <li key={`improve-${index}`}>{item}</li>
+                                ))}
+                            </ul>
+                        </section>
+                        <section>
+                            <h4>Recommended next steps</h4>
+                            <ul>
+                                {report.recommendations?.map((item, index) => (
+                                    <li key={`recommendation-${index}`}>{item}</li>
+                                ))}
+                            </ul>
+                        </section>
+                    </div>
+                </Card>
+            )}
 
-                {Object.entries(answers).map(([index, answer]) => (
+            <Card className="results-answers">
+                <h3>Question-by-question feedback</h3>
+
+                {questions.map((question, index) => (
                     <div className="response-item" key={index}>
-                        <strong>Question {Number(index) + 1}</strong>
+                        <div className="response-title">
+                            <strong>Question {index + 1}: {question.question}</strong>
+                            {evaluations[index] && (
+                                <span className="response-score">
+                                    {evaluations[index].score}/5
+                                </span>
+                            )}
+                        </div>
 
                         <p>
-                            {answer.trim() || "No response provided."}
+                            {answers[index]?.trim() || "No response provided."}
                         </p>
+                        {evaluations[index] && (
+                            <>
+                                <p className="response-feedback">
+                                    {evaluations[index].feedback}
+                                </p>
+                                {evaluations[index].improvements?.length > 0 && (
+                                    <ul>
+                                        {evaluations[index].improvements.map((item, itemIndex) => (
+                                            <li key={itemIndex}>{item}</li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </>
+                        )}
                     </div>
                 ))}
             </Card>

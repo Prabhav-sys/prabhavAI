@@ -27,8 +27,15 @@ const authSlice = createSlice({
             state.error = null;
         },
 
+        updateCreditBalance: (state, action) => {
+            if (state.user) state.user.credits = action.payload;
+        },
+
         setAuthLoading: (state, action) => {
             state.loading = action.payload;
+            if (action.payload) {
+                state.error = null;
+            }
         },
 
         setAuthError: (state, action) => {
@@ -41,6 +48,7 @@ const authSlice = createSlice({
 export const {
     setCredentials,
     clearCredentials,
+    updateCreditBalance,
     setAuthLoading,
     setAuthError
 } = authSlice.actions;

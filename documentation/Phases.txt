@@ -68,6 +68,7 @@ Phase 6 — AI Integration
 - Feedback generation.
 Deliverable: Actual AI-powered interview preparation.
 
+Current implementation: The AI service generates the opening question, evaluates each submitted answer, and adapts with a follow-up or a new competency question. It returns per-answer scores and a final report. Resume evidence is retrieved through the authenticated Node backend. Job-fit reports are generated from the selected resume evidence and uploaded job description on each run; required criteria carry four times the weight of preferred criteria in the deterministic fit score.
 
 
 Phase 7 — Mock Interview Engine
@@ -79,6 +80,7 @@ Phase 7 — Mock Interview Engine
 - Interview reports.
 Deliverable: Complete interview workflow.
 
+Current implementation: Interview sessions, turns, evaluations, and reports are persisted in MongoDB and scoped to the signed-in user. The browser provides spoken questions and optional speech-to-text with a text fallback. Voice is currently turn-based (browser speech recognition/playback plus an AI request after each submitted answer), not a continuous streaming or full-duplex audio connection.
 
 
 Phase 8 — Credit-Based System
@@ -90,6 +92,7 @@ Phase 8 — Credit-Based System
 - Preventing duplicate deductions.
 Deliverable: Working credit-based monetization system.
 
+Current implementation: Wallet balances are backed by expiring credit lots and a transaction ledger. Resume analysis/re-analysis, job fit, and 5/10/20-question interviews reserve credits and settle only after successful work; unused interview reservations are released. Welcome credits expire after 90 days and purchased credits after 12 months. Packages are 500 credits/₹249, 1,200/₹499, and 3,500/₹999. A wallet page shows balance, usage, expiry, transactions, and package costs.
 
 
 Phase 9 — Razorpay Integration
@@ -101,6 +104,7 @@ Phase 9 — Razorpay Integration
 - Credit addition after verified payment.
 Deliverable: Actual payment-to-credit workflow using Razorpay test mode.
 
+Current implementation: The client launches Razorpay Checkout when credentials are configured. The backend creates INR orders, verifies the checkout signature and captured payment with Razorpay, validates signed webhooks, and grants credits idempotently. The local configuration is in test mode and has no Razorpay keys/webhook secret configured, so checkout is disabled. Live settlements require a Razorpay merchant account with KYC and a verified bank account; the provider settles funds per the merchant's settlement settings, not directly through this application.
 
 
 Phase 10 — Dashboard and Analytics
@@ -112,6 +116,7 @@ Phase 10 — Dashboard and Analytics
 - User management.
 Deliverable: Complete user and admin dashboards.
 
+Current implementation: The user dashboard reads resume/interview/role-fit activity, credit balance, score averages, and a monthly interview-score chart from the backend. The admin view exposes aggregate usage/revenue metrics and paginated, searchable user account records behind admin authorization.
 
 Phase 11 — Advanced Engineering
 - API rate limiting.
@@ -124,6 +129,7 @@ Phase 11 — Advanced Engineering
 - Security testing.
 Deliverable: A more robust, production-oriented application.
 
+Current implementation: API-wide rate limiting, Helmet, NoSQL sanitization, request logging, schema validation, private PDF storage, ownership checks, and Mongo indexes are present. Qdrant keyword indexes on `user_id` and `resume_id` are provisioned before filtered resume searches. Cross-origin idempotency headers are allowed. A Postman smoke-test collection is provided at `postman/api-post-c-pm-prabhavai.json`; it requires a Firebase ID token and covers read-only user/admin APIs plus the non-charging Razorpay order-configuration response. Database-backed billing integration tests and a formal security test pass are still required before production sign-off.
 
 Phase 12 — Deployment and Production
 - GitHub repository.
@@ -134,3 +140,5 @@ Phase 12 — Deployment and Production
 - Production testing.
 - Domain and deployment troubleshooting.
 Deliverable: A publicly accessible, deployed SaaS application.
+
+Current implementation: Docker images and a local Compose setup are provided, including MongoDB replica-set initialization required by wallet transactions and internal AI-service networking. No public deployment, production domain, production credentials, or deployment smoke test has been performed; deployment is not complete.

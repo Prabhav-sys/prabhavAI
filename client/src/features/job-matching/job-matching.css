@@ -1,0 +1,477 @@
+.job-fit-page {
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.job-fit-purpose {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 0 0 22px;
+    padding: 14px 18px;
+    border: 1px solid #dfe5ff;
+    border-radius: 14px;
+    background: linear-gradient(110deg, #f8f9ff, #fff);
+}
+
+.job-fit-purpose-icon,
+.job-fit-empty-icon {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 12px;
+    background: #e9ecff;
+    color: #5368e8;
+    font-weight: 750;
+}
+
+.job-fit-purpose p {
+    flex: 1;
+    margin: 0;
+    color: #65738a;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.job-fit-purpose p strong {
+    color: #18243a;
+}
+
+.job-fit-cost {
+    flex: 0 0 auto;
+    color: #5368e8;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.job-fit-grid {
+    display: grid;
+    grid-template-columns: minmax(330px, 0.88fr) minmax(0, 1.12fr);
+    align-items: start;
+    gap: 22px;
+}
+
+.job-fit-form-card,
+.job-fit-report {
+    border-radius: 17px;
+}
+
+.job-fit-step > span,
+.job-fit-report-label {
+    color: #5368e8;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: 0.1em;
+}
+
+.job-fit-step h2 {
+    margin: 8px 0 6px;
+    font-size: 20px;
+}
+
+.job-fit-step p {
+    margin: 0;
+    color: #65738a;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.job-fit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 23px;
+}
+
+.job-fit-form label {
+    margin-top: 7px;
+    color: #29364b;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.job-fit-form label span {
+    color: #929daf;
+    font-weight: 400;
+}
+
+.job-fit-form input,
+.job-fit-form select,
+.job-fit-form textarea {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid #e1e6ef;
+    border-radius: 9px;
+    background: #fff;
+    color: #18243a;
+    font: inherit;
+    font-size: 12px;
+    outline: none;
+}
+
+.job-fit-form input[type="file"] {
+    min-height: auto;
+    padding: 10px;
+    border-style: dashed;
+    background: #fbfcff;
+}
+
+.job-fit-upload-note,
+.job-fit-resume-advice {
+    margin: -2px 0 4px;
+    color: #78859a;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.job-fit-resume-advice {
+    margin: -2px 0 10px;
+}
+
+.job-fit-form textarea {
+    min-height: 178px;
+    resize: vertical;
+    line-height: 1.55;
+}
+
+.job-fit-form input:focus,
+.job-fit-form select:focus,
+.job-fit-form textarea:focus {
+    border-color: #6678ea;
+    box-shadow: 0 0 0 3px rgba(83, 104, 232, 0.1);
+}
+
+.job-fit-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.job-fit-form-row > div {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.job-fit-char-count,
+.job-fit-billing-note {
+    color: #8390a3;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.job-fit-form .ui-button {
+    margin-top: 6px;
+}
+
+.job-fit-billing-note {
+    margin: 0;
+    text-align: center;
+}
+
+.job-fit-report-column {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    min-width: 0;
+}
+
+.job-fit-report-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.job-fit-report-header h2 {
+    margin: 6px 0 2px;
+    font-size: 19px;
+}
+
+.job-fit-report-header p {
+    margin: 0;
+    color: #7a879a;
+    font-size: 11px;
+}
+
+.job-fit-score {
+    display: flex;
+    width: 88px;
+    height: 88px;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border: 5px solid #e6e9ff;
+    border-radius: 50%;
+}
+
+.job-fit-score strong {
+    color: #5368e8;
+    font-size: 20px;
+}
+
+.job-fit-score span {
+    color: #7a879a;
+    font-size: 9px;
+}
+
+.job-fit-assessment {
+    margin: 20px 0;
+    color: #4d5b70;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.job-fit-coverage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.job-fit-coverage > div {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 9px;
+}
+
+.job-fit-coverage span {
+    color: #68768a;
+    font-size: 10px;
+}
+
+.job-fit-coverage strong {
+    color: #29364b;
+    font-size: 11px;
+}
+
+.job-fit-coverage i {
+    grid-column: 1 / -1;
+    display: block;
+    height: 6px;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #edf0f5;
+}
+
+.job-fit-coverage i b {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: #6878e8;
+}
+
+.job-fit-report-section {
+    margin-top: 22px;
+}
+
+.job-fit-report-section h3 {
+    margin: 0 0 10px;
+    font-size: 13px;
+}
+
+.job-fit-requirement {
+    padding: 11px 0;
+    border-top: 1px solid #eef0f4;
+}
+
+.job-fit-requirement > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.job-fit-requirement strong {
+    font-size: 11px;
+}
+
+.requirement-status {
+    flex: 0 0 auto;
+    padding: 4px 8px;
+    border-radius: 20px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: capitalize;
+}
+
+.status-matched {
+    background: #e7f8ef;
+    color: #16804a;
+}
+
+.status-partial {
+    background: #fff5dc;
+    color: #9a6a11;
+}
+
+.status-not_found {
+    background: #fff0ef;
+    color: #bd4d44;
+}
+
+.job-fit-requirement p {
+    margin: 6px 0 0;
+    color: #738095;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.job-fit-gaps > p {
+    display: flex;
+    gap: 8px;
+    margin: 8px 0;
+    color: #59677b;
+    font-size: 11px;
+    line-height: 1.55;
+}
+
+.job-fit-gaps > p span {
+    color: #8a67d8;
+    font-weight: 800;
+}
+
+.job-fit-interview-note {
+    margin: 10px 0 0;
+    color: #758298;
+    font-size: 10px;
+    line-height: 1.55;
+}
+
+.job-fit-placeholder,
+.job-fit-empty {
+    padding: 28px;
+    border-radius: 17px;
+}
+
+.job-fit-placeholder > span {
+    color: #5368e8;
+    font-size: 11px;
+    font-weight: 750;
+}
+
+.job-fit-placeholder h2,
+.job-fit-empty h2 {
+    margin: 10px 0 8px;
+    font-size: 18px;
+}
+
+.job-fit-placeholder p,
+.job-fit-empty p {
+    color: #68768a;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.job-fit-placeholder ol {
+    display: grid;
+    gap: 10px;
+    padding-left: 19px;
+    color: #65738a;
+    font-size: 11px;
+}
+
+.job-fit-placeholder ol b {
+    color: #29364b;
+}
+
+.job-fit-history {
+    padding: 18px 20px;
+    border-radius: 15px;
+}
+
+.job-fit-history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.job-fit-history-header h3 {
+    margin: 5px 0 0;
+    font-size: 14px;
+}
+
+.job-fit-history-header > span {
+    color: #758298;
+    font-size: 11px;
+}
+
+.job-fit-history > p {
+    color: #758298;
+    font-size: 11px;
+}
+
+.job-fit-history-item {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 5px;
+    border: 0;
+    border-top: 1px solid #eef0f4;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.job-fit-history-item span {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.job-fit-history-item strong {
+    overflow: hidden;
+    color: #29364b;
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.job-fit-history-item small {
+    color: #8792a2;
+    font-size: 10px;
+}
+
+.job-fit-history-item > b {
+    color: #5368e8;
+    font-size: 12px;
+}
+
+.job-fit-history-item.is-active {
+    background: #f7f8ff;
+}
+
+@media (max-width: 900px) {
+    .job-fit-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 560px) {
+    .job-fit-purpose {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .job-fit-cost {
+        width: 100%;
+        margin-left: 54px;
+    }
+
+    .job-fit-form-row,
+    .job-fit-coverage {
+        grid-template-columns: 1fr;
+    }
+
+    .job-fit-report-header {
+        align-items: flex-start;
+    }
+}

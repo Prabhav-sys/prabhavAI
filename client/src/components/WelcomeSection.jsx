@@ -1,8 +1,8 @@
 
 
+import { Link } from "react-router-dom";
 import Button from "./ui/Button";
-import Card from "./ui/Card";
-function WelcomeSection({ name }) {
+function WelcomeSection({ name, hasResume }) {
     return (
         <section className="welcome-section">
             <div>
@@ -17,9 +17,9 @@ function WelcomeSection({ name }) {
                 </p>
             </div>
 
-            <Button onClick={() => window.location.href = "/mock-interview"}>
-                Start an Interview
-            </Button>
+            <Link to={hasResume ? "/mock-interview" : "/resume-analysis"}>
+                <Button>{hasResume ? "Start an Interview" : "Analyze your resume"}</Button>
+            </Link>
         </section>
     );
 }

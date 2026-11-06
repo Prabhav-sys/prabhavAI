@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import { randomUUID } from "crypto";
 import env from "../config/env.js";
+import AppError from "../utils/AppError.js";
 
 const uploadDirectory = path.resolve("private", "resumes");
 
@@ -32,7 +33,7 @@ const upload = multer({
             file.mimetype !== "application/pdf" ||
             path.extname(file.originalname).toLowerCase() !== ".pdf"
         ) {
-            return cb(new Error("Only PDF files are accepted."));
+            return cb(new AppError("Only PDF files are accepted.", 415));
         }
 
         cb(null, true);

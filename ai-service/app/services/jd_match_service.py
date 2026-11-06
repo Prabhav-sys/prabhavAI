@@ -7,6 +7,10 @@ from app.services.llm_service import llm_service
 from app.services.vector_service import search_chunks
 
 
+class ResumeEvidenceNotFoundError(Exception):
+    pass
+
+
 async def match_resume_to_job(*, user_id: str, request: JobDescriptionMatchRequest):
     # Retrieve evidence only from this user's selected resume.
     query = f"{request.job_title}\n{request.job_description[:5000]}"
@@ -17,7 +21,9 @@ async def match_resume_to_job(*, user_id: str, request: JobDescriptionMatchReque
         resume_id=request.resume_id,
     )
     if not hits:
-        raise ValueError("No indexed resume content found for this user and resume ID")
+        raise ResumeEvidenceNotFoundError(
+            "No indexed resume content found for this user and resume ID"
+        )
 
     evidence_context = "\n\n".join(
         f"[Resume evidence {i + 1}; relevance={float(hit.score or 0):.3f}]\n{hit.payload.get('text', '')}"
@@ -32,7 +38,12 @@ async def match_resume_to_job(*, user_id: str, request: JobDescriptionMatchReque
             "Use status matched only when evidence directly supports the requirement; partial "
             "when evidence is adjacent or incomplete; not_found when no evidence appears. "
             "Not_found means not demonstrated in this resume, not proof the candidate lacks it. "
-            "Keep evidence concise and quote/paraphrase the supplied excerpts faithfully."
+            "Keep evidence concise and quote/paraphrase the supplied excerpts faithfully. "
+            "Give practical, prioritized resume improvement recommendations: identify which "
+            "existing bullet or section to strengthen, what job-relevant evidence to surface, "
+            "and a concise example rewrite only when supported by the resume. Never invent "
+            "skills, credentials, employers, dates, metrics, or achievements; explicitly tell "
+            "the candidate to add a metric only if they can verify it."
         ),
         user=(
             f"JOB TITLE: {request.job_title}\nCOMPANY: {request.company or 'Not specified'}\n\n"
@@ -49,19 +60,25 @@ async def match_resume_to_job(*, user_id: str, request: JobDescriptionMatchReque
 
     def coverage(items):
         if not items:
-            return 100
+            return 0
         points = sum(1.0 if item.status == "matched" else 0.5 if item.status == "partial" else 0.0 for item in items)
         return round(points / len(items) * 100)
 
     required_coverage = coverage(required)
     preferred_coverage = coverage(preferred)
-    # Deterministic score: required qualifications dominate; preferred are a smaller bonus.
-    match_score = round(required_coverage * 0.8 + preferred_coverage * 0.2)
+    weighted_points = sum(
+        (4 if item.importance == "required" else 1)
+        * (1.0 if item.status == "matched" else 0.5 if item.status == "partial" else 0.0)
+        for item in analysis.requirements
+    )
+    total_weight = sum(4 if item.importance == "required" else 1 for item in analysis.requirements)
+    match_score = round(weighted_points / total_weight * 100)
 
     return JobDescriptionMatchResponse(
         resume_id=request.resume_id,
         job_title=request.job_title,
         company=request.company,
+        job_description=request.job_description,
         match_score=match_score,
         required_coverage=required_coverage,
         preferred_coverage=preferred_coverage,

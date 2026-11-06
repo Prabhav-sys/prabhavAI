@@ -50,6 +50,16 @@ export const errorHandler = (err, req, res, next) => {
 
     // Known application errors
     if (err instanceof AppError) {
+        if (err.code === "INSUFFICIENT_CREDITS") {
+            return res.status(err.statusCode).json({
+                success: false,
+                code: err.code,
+                message: err.message,
+                requiredCredits: err.requiredCredits,
+                availableCredits: err.availableCredits
+            });
+        }
+
         return sendError(res, {
             statusCode: err.statusCode,
             message: err.message,
@@ -62,6 +72,15 @@ export const errorHandler = (err, req, res, next) => {
         return sendError(res, {
             statusCode: 413,
             message: "Request payload is too large"
+        });
+    }
+
+    if (err.name === "MulterError") {
+        return sendError(res, {
+            statusCode: err.code === "LIMIT_FILE_SIZE" ? 413 : 400,
+            message: err.code === "LIMIT_FILE_SIZE"
+                ? "The uploaded PDF exceeds the configured file-size limit."
+                : "The uploaded file could not be processed."
         });
     }
 

@@ -33,6 +33,7 @@ class JobDescriptionMatchResponse(BaseModel):
     resume_id: str
     job_title: str
     company: str | None = None
+    job_description: str = Field(min_length=100, max_length=20000)
     match_score: int = Field(ge=0, le=100)
     required_coverage: int = Field(ge=0, le=100)
     preferred_coverage: int = Field(ge=0, le=100)

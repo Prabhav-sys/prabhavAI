@@ -1,111 +1,310 @@
-
+import { useEffect, useRef, useState } from "react";
 import Card from "../../../components/ui/Card";
 import Button from "../../../components/ui/Button";
 
-const sampleQuestions = [
-    "Tell me about yourself and your professional background.",
-    "Explain a challenging technical problem you have solved.",
-    "How do you approach debugging an unfamiliar application?",
-    "Describe a situation where you worked under a tight deadline.",
-    "Why do you want to work in this particular role?"
-];
+const getSpeechRecognition = () => {
+    if (typeof window === "undefined") return null;
+    return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+};
 
 function InterviewWorkspace({
     config,
+    questions,
     questionIndex,
     answer,
     setAnswer,
-    onNext,
-    onPrevious,
-    onFinish
+    submitting,
+    onSubmitAnswer,
+    onAbandon
 }) {
-    const question = sampleQuestions[
-        questionIndex % sampleQuestions.length
-    ];
+    const question = questions[questionIndex];
+    const recognitionRef = useRef(null);
+    const mountedRef = useRef(true);
+    const answerAtStartRef = useRef("");
+    const [isListening, setIsListening] = useState(false);
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const [interimTranscript, setInterimTranscript] = useState("");
+    const [voiceMessage, setVoiceMessage] = useState("");
+    const [voiceSupported] = useState(() => Boolean(getSpeechRecognition()));
+    const progress = ((questionIndex + 1) / config.questionCount) * 100;
 
-    const progress =
-        ((questionIndex + 1) / config.questionCount) * 100;
+    useEffect(() => {
+        mountedRef.current = true;
+        if (window.speechSynthesis && window.SpeechSynthesisUtterance) {
+            const utterance = new window.SpeechSynthesisUtterance(question.question);
+            utterance.onstart = () => {
+                if (mountedRef.current) setIsSpeaking(true);
+            };
+            utterance.onend = () => {
+                if (mountedRef.current) setIsSpeaking(false);
+            };
+            window.speechSynthesis.speak(utterance);
+        }
+        return () => {
+            mountedRef.current = false;
+            recognitionRef.current?.abort();
+            window.speechSynthesis?.cancel();
+        };
+    }, [question.question]);
+
+    const speakQuestion = () => {
+        if (isSpeaking) {
+            window.speechSynthesis?.cancel();
+            setIsSpeaking(false);
+            return;
+        }
+
+        if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
+            setVoiceMessage("Spoken questions are not supported in this browser. You can read the question and answer by text.");
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+        const utterance = new window.SpeechSynthesisUtterance(question.question);
+        utterance.onstart = () => {
+            if (mountedRef.current) setIsSpeaking(true);
+        };
+        utterance.onend = () => {
+            if (mountedRef.current) setIsSpeaking(false);
+        };
+        utterance.onerror = () => {
+            if (mountedRef.current) {
+                setIsSpeaking(false);
+                setVoiceMessage("The question could not be played. You can continue by reading it on screen.");
+            }
+        };
+        window.speechSynthesis.speak(utterance);
+        setVoiceMessage("");
+    };
+
+    const toggleListening = () => {
+        if (isListening) {
+            recognitionRef.current?.stop();
+            return;
+        }
+
+        window.speechSynthesis?.cancel();
+        setIsSpeaking(false);
+        const SpeechRecognition = getSpeechRecognition();
+        if (!SpeechRecognition) {
+            setVoiceMessage("Speech input is unavailable in this browser. You can type your answer instead.");
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = navigator.language || "en-US";
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        answerAtStartRef.current = answer.trim();
+
+        recognition.onstart = () => {
+            if (mountedRef.current) {
+                setIsListening(true);
+                setVoiceMessage("Listening. Your browser's speech recognition is active.");
+            }
+        };
+        recognition.onresult = (event) => {
+            if (!mountedRef.current) return;
+            let finalTranscript = "";
+            let interim = "";
+
+            for (let index = event.resultIndex; index < event.results.length; index += 1) {
+                const transcript = event.results[index][0].transcript;
+                if (event.results[index].isFinal) {
+                    finalTranscript += transcript;
+                } else {
+                    interim += transcript;
+                }
+            }
+
+            if (finalTranscript.trim()) {
+                const prefix = answerAtStartRef.current;
+                const separator = prefix && !/\s$/.test(prefix) ? " " : "";
+                const nextAnswer = `${prefix}${separator}${finalTranscript.trim()}`.trim();
+                setAnswer(nextAnswer);
+                answerAtStartRef.current = nextAnswer;
+            }
+            setInterimTranscript(interim);
+        };
+        recognition.onerror = (event) => {
+            if (!mountedRef.current) return;
+            setIsListening(false);
+            setInterimTranscript("");
+            if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+                setVoiceMessage("Microphone access was blocked. Allow microphone access in your browser settings, or type your answer.");
+            } else if (event.error === "no-speech") {
+                setVoiceMessage("No speech was detected. Try again or type your answer.");
+            } else if (event.error !== "aborted") {
+                setVoiceMessage("Speech input stopped unexpectedly. You can retry or type your answer.");
+            }
+        };
+        recognition.onend = () => {
+            if (!mountedRef.current) return;
+            setIsListening(false);
+            setInterimTranscript("");
+            setVoiceMessage((message) => message.startsWith("Listening.")
+                ? "Speech capture stopped. Review your transcript, then continue."
+                : message);
+            if (recognitionRef.current === recognition) {
+                recognitionRef.current = null;
+            }
+        };
+
+        recognitionRef.current = recognition;
+        try {
+            recognition.start();
+        } catch {
+            recognitionRef.current = null;
+            setIsListening(false);
+            setVoiceMessage("Could not start speech input. Check your browser microphone settings, or type your answer.");
+        }
+    };
 
     return (
-        <div className="interview-workspace">
-
-            <div className="interview-session-header">
-                <div>
-                    <span className="interview-label">
-                        MOCK INTERVIEW
-                    </span>
-
-                    <h2>{config.role}</h2>
-
-                    <p>
-                        {config.type} · {config.difficulty} · {config.experience}
-                    </p>
+        <main className="interview-room">
+            <header className="interview-room-header">
+                <div className="interview-room-brand">
+                    <span className="interview-room-mark" aria-hidden="true">P</span>
+                    <div>
+                        <span className="interview-label">LIVE PRACTICE SESSION</span>
+                        <h1>{config.role}</h1>
+                        <p>{config.type} interview <span aria-hidden="true">·</span> {config.experience} <span aria-hidden="true">·</span> {config.difficulty}</p>
+                    </div>
                 </div>
-
-                <div className="question-counter">
-                    Question {questionIndex + 1} of {config.questionCount}
+                <div className="interview-room-progress">
+                    <span>QUESTION {questionIndex + 1} OF UP TO {config.questionCount}</span>
+                    <div
+                        className="interview-progress"
+                        role="progressbar"
+                        aria-label="Interview progress"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        aria-valuenow={Math.round(progress)}
+                    >
+                        <div style={{ width: `${progress}%` }} />
+                    </div>
                 </div>
-            </div>
-
-            <div className="interview-progress">
-                <div style={{ width: `${progress}%` }} />
-            </div>
-
-            <Card className="question-card">
-                <div className="question-card-header">
-                    <span>QUESTION {questionIndex + 1}</span>
-                    <span>{config.difficulty}</span>
-                </div>
-
-                <h2>{question}</h2>
-
-                <p>
-                    Take your time and structure your answer clearly.
-                    Support your response with relevant examples.
-                </p>
-            </Card>
-
-            <Card className="answer-card">
-                <div className="answer-heading">
-                    <h3>Your Answer</h3>
-                    <span>Text response</span>
-                </div>
-
-                <textarea
-                    value={answer}
-                    onChange={(e) => setAnswer(e.target.value)}
-                    placeholder="Type your answer here..."
-                    rows={9}
-                />
-
-                <p className="answer-hint">
-                    Your response is currently stored in this browser session.
-                </p>
-            </Card>
-
-            <div className="interview-controls">
-
                 <Button
                     variant="secondary"
-                    onClick={onPrevious}
-                    disabled={questionIndex === 0}
+                    className="interview-end-button"
+                    onClick={onAbandon}
+                    disabled={submitting || isListening}
                 >
-                    ← Previous
+                    End interview
                 </Button>
+            </header>
 
-                {questionIndex === config.questionCount - 1 ? (
-                    <Button onClick={onFinish}>
-                        Finish Interview
-                    </Button>
-                ) : (
-                    <Button onClick={onNext}>
-                        Next Question →
-                    </Button>
-                )}
+            <div className="interview-room-body">
+                <section className="interviewer-stage" aria-label="AI interviewer">
+                    <div className={`interviewer-avatar${isSpeaking ? " is-speaking" : ""}`} aria-hidden="true">
+                        <span>AI</span>
+                        <i />
+                    </div>
+                    <span className="interviewer-name">Your AI interviewer</span>
+                    <span className="interviewer-status">
+                        <i className={isListening ? "status-live" : ""} />
+                        {isListening
+                            ? "Listening to your answer"
+                            : submitting
+                                ? "Considering your answer"
+                                : isSpeaking
+                                    ? "Asking the question"
+                                    : "Ready when you are"}
+                    </span>
+                    <p className="interviewer-note">
+                        Take a moment to think. Answer naturally, as you would in a real interview.
+                    </p>
+                </section>
 
+                <section className="interview-conversation" aria-live="polite">
+                    <div className="interview-question-meta">
+                        <span>QUESTION {questionIndex + 1}</span>
+                        {question.category && <span>{question.category}</span>}
+                        <span>{question.difficulty || config.difficulty}</span>
+                    </div>
+                    <h2>{question.question}</h2>
+                    <Button
+                        variant="secondary"
+                        className="question-audio-button"
+                        onClick={speakQuestion}
+                        aria-label="Play interview question aloud"
+                    >
+                        {isSpeaking ? "Stop question audio" : "▶  Replay question"}
+                    </Button>
+
+                    <Card className="candidate-answer-card">
+                        <div className="candidate-answer-heading">
+                            <div>
+                                <span className="answer-overline">YOUR RESPONSE</span>
+                                <h3>Answer the interviewer</h3>
+                            </div>
+                            <span className="transcript-indicator">
+                                <i className={isListening ? "status-live" : ""} />
+                                {isListening ? "Transcribing" : "Transcript"}
+                            </span>
+                        </div>
+                        <label className="sr-only" htmlFor="interview-answer">
+                            Your interview answer
+                        </label>
+                        <textarea
+                            id="interview-answer"
+                            value={`${answer}${interimTranscript ? `${answer && !/\s$/.test(answer) ? " " : ""}${interimTranscript}` : ""}`}
+                            onChange={(event) => {
+                                setAnswer(event.target.value);
+                                answerAtStartRef.current = event.target.value;
+                            }}
+                            placeholder="Your spoken answer will appear here. You can also type your response."
+                            rows={5}
+                            aria-describedby="voice-privacy-note"
+                        />
+                        <div className="voice-privacy-note" id="voice-privacy-note">
+                            <span aria-hidden="true">i</span>
+                            Browser speech recognition may process audio through your browser provider. Submitted transcripts are sent to the AI interviewer and saved for your report; this app does not store audio recordings.
+                        </div>
+                        {voiceMessage && (
+                            <p className={`voice-feedback${isListening ? " voice-feedback-live" : ""}`} role="status">
+                                {voiceMessage}
+                            </p>
+                        )}
+                        {!voiceSupported && (
+                            <p className="voice-feedback" role="status">
+                                Speech input is not supported in this browser. You can still complete the interview by typing.
+                            </p>
+                        )}
+                        <div className="voice-controls">
+                            <Button
+                                onClick={toggleListening}
+                                disabled={!voiceSupported}
+                                className={`microphone-button${isListening ? " microphone-button-active" : ""}`}
+                                aria-pressed={isListening}
+                            >
+                                <span aria-hidden="true">{isListening ? "■" : "●"}</span>
+                                {isListening ? "Stop recording" : "Start speaking"}
+                            </Button>
+                            {isListening && (
+                                <span className="recording-caption"><i /> Your answer is being captured</span>
+                            )}
+                        </div>
+                    </Card>
+
+                    <div className="interview-room-controls">
+                        <span className="room-saved-note">
+                            {submitting
+                                ? "Your interviewer is evaluating your response..."
+                                : "Your interviewer adapts the next question to your answer."}
+                        </span>
+                        <Button
+                            onClick={onSubmitAnswer}
+                            disabled={isListening || submitting || !answer.trim()}
+                        >
+                            {submitting
+                                ? "Evaluating answer..."
+                                : "Submit answer"}
+                        </Button>
+                    </div>
+                </section>
             </div>
-
-        </div>
+        </main>
     );
 }
 

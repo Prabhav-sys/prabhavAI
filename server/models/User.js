@@ -38,6 +38,11 @@ const userSchema = new mongoose.Schema(
             type: Number,
             default: 250,
             min: 0
+        },
+
+        creditsWalletInitialized: {
+            type: Boolean,
+            default: false
         }
     },
     {
