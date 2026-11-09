@@ -1,0 +1,11 @@
+to run this app :
+open terminal1:
+cd client -> npm run dev
+
+open terminal2:
+cd server -> npm run dev
+
+open terminal3:
+cd ai-service -> uv run uvicorn app.main:app --reload --host 127.0.0.1 --port 8001       
+
+and just visit : http://localhost:5173/
