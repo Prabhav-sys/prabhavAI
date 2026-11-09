@@ -121,8 +121,8 @@ function InterviewWorkspace({
         utterance.voice = voices.find(
             (voice) => voice.voiceURI === voiceURIRef.current
         ) || preferredVoice(voices, navigator.language);
-        utterance.rate = 0.88;
-        utterance.pitch = 1.08;
+        utterance.rate = 1;
+        utterance.pitch = 1;
         utterance.onstart = () => {
             if (mountedRef.current) setIsSpeaking(true);
         };
