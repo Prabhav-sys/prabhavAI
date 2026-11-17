@@ -10,7 +10,7 @@ function Login() {
     const navigate = useNavigate();
     const location = useLocation();
 
-    const { loginWithGoogle } = useAuth();
+    const { loginWithGoogle, redirectError } = useAuth();
 
     const {
         isAuthenticated,
@@ -48,8 +48,6 @@ function Login() {
                     "This sign-in address is not authorized by Firebase. " +
                     "Use http://localhost:5173 instead of 127.0.0.1."
                 );
-            } else if (err.code === "auth/popup-closed-by-user") {
-                setError("The Google sign-in window was closed before login completed.");
             } else {
                 setError(err.message || "Unable to sign in.");
             }
@@ -125,8 +123,10 @@ function Login() {
                                 {loginLoading ? "Connecting securely..." : "Continue with Google"}
                                 {!loginLoading && <span className="login-button-arrow" aria-hidden="true">→</span>}
                             </button>
-                            {(error || authError) && (
-                                <p className="login-error" role="alert">{error || authError}</p>
+                            {(error || redirectError || authError) && (
+                                <p className="login-error" role="alert">
+                                    {error || redirectError || authError}
+                                </p>
                             )}
                             <p className="login-terms">
                                 By continuing, you agree to use prabhavAI for interview practice.

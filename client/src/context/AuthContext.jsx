@@ -7,8 +7,9 @@ import {
 } from "react";
 
 import {
+    getRedirectResult,
     onAuthStateChanged,
-    signInWithPopup,
+    signInWithRedirect,
     signOut
 } from "firebase/auth";
 
@@ -19,6 +20,7 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
     const [firebaseUser, setFirebaseUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [redirectError, setRedirectError] = useState("");
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -26,11 +28,30 @@ export const AuthProvider = ({ children }) => {
             setLoading(false);
         });
 
-        return unsubscribe;
+        let active = true;
+
+        getRedirectResult(auth)
+            .then((result) => {
+                if (active && result) {
+                    setFirebaseUser(result.user);
+                }
+            })
+            .catch((error) => {
+                if (active) {
+                    setRedirectError(
+                        error.message || "Unable to complete Google sign-in."
+                    );
+                }
+            });
+
+        return () => {
+            active = false;
+            unsubscribe();
+        };
     }, []);
 
     const loginWithGoogle = async () => {
-        return await signInWithPopup(auth, googleProvider);
+        return await signInWithRedirect(auth, googleProvider);
     };
 
     const logout = async () => {
@@ -50,6 +71,7 @@ export const AuthProvider = ({ children }) => {
             value={{
                 firebaseUser,
                 loading,
+                redirectError,
                 loginWithGoogle,
                 logout,
                 getIdToken
