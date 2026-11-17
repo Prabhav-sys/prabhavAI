@@ -23,26 +23,35 @@ export const AuthProvider = ({ children }) => {
     const [redirectError, setRedirectError] = useState("");
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-            setFirebaseUser(currentUser);
-            setLoading(false);
-        });
-
         let active = true;
+        let unsubscribe = () => {};
 
-        getRedirectResult(auth)
-            .then((result) => {
+        const initializeAuth = async () => {
+            try {
+                const result = await getRedirectResult(auth);
+
                 if (active && result) {
                     setFirebaseUser(result.user);
                 }
-            })
-            .catch((error) => {
+            } catch (error) {
                 if (active) {
                     setRedirectError(
                         error.message || "Unable to complete Google sign-in."
                     );
                 }
+            }
+
+            if (!active) {
+                return;
+            }
+
+            unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                setFirebaseUser(currentUser);
+                setLoading(false);
             });
+        };
+
+        initializeAuth();
 
         return () => {
             active = false;
