@@ -4,7 +4,7 @@ import env from "./env.js";
 const logger = pino({
     level: env.nodeEnv === "production" ? "info" : "debug",
 
-    transport: env.nodeEnv === "production"
+    transport: env.nodeEnv !== "production"
         ? undefined
         : {
             target: "pino-pretty",
