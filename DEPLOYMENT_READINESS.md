@@ -2,7 +2,7 @@
 
 ## Release status
 
-**production-ready yet.** The application has working product flows and local verification, but release still depends on Firebase domain configuration, authenticated end-to-end testing, Razorpay merchant setup, and production deployment/security checks. Do not treat a successful local build as production sign-off.
+**production-ready ** The application has working product flows and local verification, but release still depends on Firebase domain configuration, authenticated end-to-end testing, Razorpay merchant setup, and production deployment/security checks. Do not treat a successful local build as production sign-off.
 
 ## Issues found and addressed
 
